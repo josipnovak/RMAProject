@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ProjectRMA</string>
+    <string name="login">Prijava</string>
+    <string name="register">Registracija</string>
+    <string name="email">Email</string>
+    <string name="password">Lozinka</string>
+    <string name="confirm_password">Potvrdi lozinku</string>
+    <string name="name">Ime</string>
+    <string name="team_code">Kod tima</string>
+    <string name="team_name">Ime tima</string>
+    <string name="player">Igrač</string>
+    <string name="coach">Trener</string>
+    <string name="welcome">Dobrodošao %1$s</string>
+    <string name="weekly_summary">Jedni sažetak</string>
+    <string name="best_players">Najbolji igrači</string>
+    <string name="upcoming_events">Nadolazeći događaji</string>
+    <string name="search">Pretraži</string>
+    <string name="players">Igrači</string>
+    <string name="account_details">Detalji računa</string>
+</resources>
