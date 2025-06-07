@@ -1,5 +1,6 @@
 package hr.ferit.josipnovak.projectrma.view
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,7 +27,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,21 +43,48 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import hr.ferit.josipnovak.projectrma.ui.FooterPlayers
 import hr.ferit.josipnovak.projectrma.R
+import hr.ferit.josipnovak.projectrma.model.User
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
 import hr.ferit.josipnovak.projectrma.ui.theme.LightBlue
+import hr.ferit.josipnovak.projectrma.viewmodel.PlayersViewModel
 
 @Composable
-fun PlayersView(modifier: Modifier = Modifier, navController: NavController) {
+fun PlayersView(modifier: Modifier = Modifier, navController: NavController, playersViewModel: PlayersViewModel) {
     var searchQuery by remember { mutableStateOf("") }
-    val players = mapOf(
-        "Goalkeepers" to listOf("Player 1" to 0, "Player 2" to 0),
-        "Defenders" to listOf("Player 3" to 7, "Player 4" to 5),
-        "Midfielders" to listOf("Player 5" to 5, "Player 6" to 14),
-        "Forwards" to listOf("Player 7" to 28, "Player 8" to 25)
-    )
+
+    var userId by remember { mutableStateOf("") }
+    var clubId by remember { mutableStateOf("") }
+    var role by remember { mutableStateOf("") }
+    var players by remember { mutableStateOf<Map<String, List<User>>>(emptyMap()) }
+
+    LaunchedEffect(Unit){
+        playersViewModel.getUserDetails(
+            onSuccess = { fetchedId, fetchedClubIdOrRole, fetchedRole ->
+                if (fetchedRole == "player") {
+                    userId = fetchedId
+                } else if (fetchedRole == "coach") {
+                    clubId = fetchedClubIdOrRole
+                    playersViewModel.fetchAndGroupPlayers(
+                        clubId = clubId,
+                        onSuccess = { groupedPlayers ->
+                            players = groupedPlayers
+                            Log.d("Players", "Fetched players: $players")
+                        },
+                        onError = { errorMessage ->
+                            println("Error: $errorMessage")
+                        }
+                    )
+                }
+                role = fetchedRole
+            },
+            onError = { error ->
+
+            }
+        )
+    }
     Box(
         modifier = modifier
-            .background(color = DarkBlue)
+            .background(color = DarkBlue )
     )
     {
         IconButton(
@@ -128,7 +158,7 @@ fun PlayersView(modifier: Modifier = Modifier, navController: NavController) {
                 )
 
                 IconButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { navController.navigate("add_new_player") },
                     modifier = Modifier
                         .size(60.dp)
                         .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
@@ -161,7 +191,7 @@ fun PlayersView(modifier: Modifier = Modifier, navController: NavController) {
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
                     }
-                    items(playerList.size) { it ->
+                    items(playerList.size) { index ->
                         Card(
                             shape = RoundedCornerShape(12.dp),
                             colors = CardDefaults.cardColors(containerColor = LightBlue),
@@ -169,22 +199,21 @@ fun PlayersView(modifier: Modifier = Modifier, navController: NavController) {
                                 .fillMaxWidth()
                                 .height(80.dp)
                                 .padding(vertical = 8.dp),
-                            onClick = { /*TODO*/ }
+                            onClick = { navController.navigate("player/${playerList[index].id}") }
                         ) {
-                            /*TODO mozda dodaj slike ispred svakog igraca*/
                             Column(
                                 modifier = Modifier.fillMaxSize(),
                                 verticalArrangement = Arrangement.Top
                             ) {
                                 Text(
-                                    text = playerList[it].first,
+                                    text = playerList[index].name,
                                     fontSize = 18.sp,
                                     color = Color.White,
                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "Age: ${playerList[it].second}",
+                                    text = "Matches: ${playerList[index].matches}",
                                     fontSize = 14.sp,
                                     color = Color.White,
                                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)

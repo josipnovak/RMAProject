@@ -3,7 +3,7 @@ package hr.ferit.josipnovak.projectrma.model
 import androidx.compose.ui.semantics.Role
 
 data class User(
-    val id: String = "",
+    var id: String = "",
     val name: String = "",
     val email: String = "",
     val password: String = "",

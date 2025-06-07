@@ -33,7 +33,7 @@
     <string name="edit_player">Uredi igrača</string>
     <string name="add_new_player">Dodaj novog igrača</string>
     <string name="player_name">Ime igrača</string>
-    <string name="age">Godine</string>
+    <string name="assists">Asistencije</string>
     <string name="position">Pozicija</string>
     <string name="matches">Utakmice</string>
     <string name="goals">Golovi</string>
@@ -43,4 +43,8 @@
     <string name="password_error">Lozinke se ne podudaraju</string>
     <string name="internal_error">Greška prilikom spremanja</string>
     <string name="club_not_found">Pogrešan kod kluba</string>
+    <string name="goalkeeper">Golman</string>
+    <string name="defender">Branič</string>
+    <string name="midfielder">Vezni igrač</string>
+    <string name="attacker">Napadač</string>
 </resources>

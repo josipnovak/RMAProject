@@ -32,7 +32,7 @@
     <string name="edit_player">Edit player</string>
     <string name="add_new_player">Add new player</string>
     <string name="player_name">Player name</string>
-    <string name="age">Age</string>
+    <string name="assists">Assists</string>
     <string name="position">Position</string>
     <string name="matches">Matches</string>
     <string name="goals">Goals</string>
@@ -42,4 +42,8 @@
     <string name="password_error">Passwords do not match</string>
     <string name="internal_error">Error while saving</string>
     <string name="club_not_found">Wrong club code</string>
+    <string name="goalkeeper">Goalkeeper</string>
+    <string name="defender">Defender</string>
+    <string name="midfielder">Midfielder</string>
+    <string name="attacker">Attacker</string>
 </resources>

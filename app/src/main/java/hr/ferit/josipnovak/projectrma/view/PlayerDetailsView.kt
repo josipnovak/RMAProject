@@ -1,5 +1,6 @@
 package hr.ferit.josipnovak.projectrma.view
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +22,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,17 +36,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import hr.ferit.josipnovak.projectrma.R
+import hr.ferit.josipnovak.projectrma.model.User
 import hr.ferit.josipnovak.projectrma.ui.FooterPlayers
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
+import hr.ferit.josipnovak.projectrma.viewmodel.PlayersViewModel
 
 @Composable
-fun PlayerDetailsView(modifier: Modifier = Modifier, navController: NavController) {
+fun PlayerDetailsView(modifier: Modifier = Modifier, navController: NavController, playersViewModel: PlayersViewModel, playerId: String) {
+    var player by remember { mutableStateOf<User?>(null) }
+    LaunchedEffect(playerId) {
+        try {
+            player = playersViewModel.getPlayerById(playerId)
+        } catch (e: Exception) {
+            player = null
+        }
+    }
     Box(
         modifier = modifier
             .background(color = DarkBlue)
     ) {
         IconButton(
-            onClick = { /*TODO*/ },
+            onClick = { navController.navigateUp() },
             modifier = Modifier
                 .size(60.dp)
                 .padding(top = 40.dp, start = 10.dp)
@@ -73,72 +89,75 @@ fun PlayerDetailsView(modifier: Modifier = Modifier, navController: NavControlle
                         .fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(40.dp))
-                Text(
-                    text = "Name",
-                    color = Color.White,
-                    fontSize = 30.sp,
-                    modifier = Modifier.padding(top = 40.dp)
-                )
-                Text(
-                    text = "Position",
-                    color = Color.White,
-                    fontSize = 30.sp,
-                    modifier = Modifier.padding(top = 40.dp)
-                )
-                Text(
-                    text = "Age",
-                    color = Color.White,
-                    fontSize = 30.sp,
-                    modifier = Modifier.padding(top = 40.dp)
-                )
-                Text(
-                    text = "Matches Played",
-                    color = Color.White,
-                    fontSize = 30.sp,
-                    modifier = Modifier.padding(top = 40.dp)
-                )
-                Text(
-                    text = "Goals",
-                    color = Color.White,
-                    fontSize = 30.sp,
-                    modifier = Modifier.padding(top = 40.dp)
-                )
-                Text(
-                    text = "Trainings",
-                    color = Color.White,
-                    fontSize = 30.sp,
-                    modifier = Modifier.padding(top = 40.dp)
-                )
-                Spacer(modifier = Modifier.height(40.dp))
-                Row() {
-                    Button(
-                        onClick = { /*TODO*/ },
-                        modifier = Modifier
-                            .width(125.dp)
-                            .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                        shape = RoundedCornerShape(15.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.delete),
-                            color = Color.Black,
-                            fontSize = 20.sp
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(20.dp))
-                    Button(
-                        onClick = { /*TODO*/ },
-                        modifier = Modifier
-                            .width(125.dp)
-                            .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                        shape = RoundedCornerShape(15.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.edit),
-                            color = Color.Black,
-                            fontSize = 20.sp
-                        )
+                player?.let{player ->
+                    Log.d("PlayerDetailsView", "Player details: $player")
+                    Text(
+                        text = player.name,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(top = 40.dp)
+                    )
+                    Text(
+                        text = player.position,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(top = 40.dp)
+                    )
+                    Text(
+                        text = "Matches: ${player.matches}",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(top = 40.dp)
+                    )
+                    Text(
+                        text = "Goals: ${player.goals}",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(top = 40.dp)
+                    )
+                    Text(
+                        text = "Assists: ${player.assists}",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(top = 40.dp)
+                    )
+                    Text(
+                        text = "Trainings: ${player.trainings}",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(top = 40.dp)
+                    )
+                    Spacer(modifier = Modifier.height(40.dp))
+                    Row() {
+                        Button(
+                            onClick = { /*TODO*/ },
+                            modifier = Modifier
+                                .width(125.dp)
+                                .height(50.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                            shape = RoundedCornerShape(15.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.delete),
+                                color = Color.Black,
+                                fontSize = 20.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(20.dp))
+                        Button(
+                            onClick = { navController.navigate("edit_player/${player.id}") },
+                            modifier = Modifier
+                                .width(125.dp)
+                                .height(50.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                            shape = RoundedCornerShape(15.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.edit),
+                                color = Color.Black,
+                                fontSize = 20.sp
+                            )
+                        }
                     }
                 }
             }

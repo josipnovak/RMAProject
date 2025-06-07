@@ -91,7 +91,13 @@ import java.util.Calendar
 import hr.ferit.josipnovak.projectrma.view.StartScreenView
 import hr.ferit.josipnovak.projectrma.view.UpcomingEventsView
 import hr.ferit.josipnovak.projectrma.view.AccountDetailsView
+import hr.ferit.josipnovak.projectrma.view.AddNewEventView
+import hr.ferit.josipnovak.projectrma.view.AddNewPlayerView
+import hr.ferit.josipnovak.projectrma.view.EditPlayerView
+import hr.ferit.josipnovak.projectrma.view.PlayerDetailsView
 import hr.ferit.josipnovak.projectrma.viewmodel.AuthViewModel
+import hr.ferit.josipnovak.projectrma.viewmodel.EventsViewModel
+import hr.ferit.josipnovak.projectrma.viewmodel.PlayersViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -104,6 +110,8 @@ class MainActivity : ComponentActivity() {
             val fbAuth = FirebaseAuth
             val db = FirebaseFirestore.getInstance()
             val authViewModel = AuthViewModel(fbAuth, db, this)
+            val playersViewModel = PlayersViewModel(fbAuth, db)
+            val eventsViewModel = EventsViewModel(fbAuth, db)
             val startDestination = if (fbAuth.getCurrentUser() != null) "main" else "start"
             ProjectRMATheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -115,13 +123,30 @@ class MainActivity : ComponentActivity() {
                         composable("register_coach") { RegisterCoachView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, authViewModel = authViewModel) }
                         composable("register_player") { RegisterPlayerView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, authViewModel = authViewModel) }
                         composable("main") { MainScreenView(modifier = Modifier.padding(bottom = 25.dp), navController = navController) }
-                        composable("upcoming_events") { UpcomingEventsView(modifier = Modifier.padding(bottom = 25.dp), navController = navController) }
-                        composable("players") { PlayersView(modifier = Modifier.padding(bottom = 25.dp), navController = navController) }
-                        composable("account_details") { AccountDetailsView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, fbAuth = fbAuth) }
+                        composable("upcoming_events") { UpcomingEventsView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, eventsViewModel = eventsViewModel) }
+                        composable("players") { PlayersView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, playersViewModel = playersViewModel) }
+                        composable("account_details") { AccountDetailsView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, authViewModel = authViewModel) }
+                        composable("player/{playerId}") { backStackEntry ->
+                            val playerId = backStackEntry.arguments?.getString("playerId")
+                            if (playerId != null) {
+                                PlayerDetailsView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, playersViewModel = playersViewModel, playerId = playerId)
+                            } else {
+                                Log.e("PlayersView", "Player ID is null")
+                            }
+                        }
+                        composable("add_new_player") { AddNewPlayerView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, playersViewModel = playersViewModel) }
+                        composable("edit_player/{playerId}") { backStackEntry ->
+                            val playerId = backStackEntry.arguments?.getString("playerId")
+                            if (playerId != null) {
+                                EditPlayerView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, playersViewModel = playersViewModel, playerId = playerId)
+                            } else {
+                                Log.e("PlayersView", "Player ID is null")
+                            }
+                        }
+                        composable("add_event") { AddNewEventView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, eventsViewModel = eventsViewModel) }
                     }
                 }
             }
         }
     }
 }
-

@@ -65,4 +65,6 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation ("androidx.navigation:navigation-compose:2.7.5")
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
+    implementation ("com.google.android.gms:play-services-maps:18.1.0")
+    implementation ("com.google.maps.android:maps-compose:2.11.0")
 }

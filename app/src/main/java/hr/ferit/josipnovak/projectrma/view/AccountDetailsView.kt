@@ -32,9 +32,10 @@ import hr.ferit.josipnovak.projectrma.FirebaseAuth
 import hr.ferit.josipnovak.projectrma.ui.FooterUser
 import hr.ferit.josipnovak.projectrma.R
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
+import hr.ferit.josipnovak.projectrma.viewmodel.AuthViewModel
 
 @Composable
-fun AccountDetailsView(modifier: Modifier = Modifier, navController: NavController, fbAuth: FirebaseAuth) {
+fun AccountDetailsView(modifier: Modifier = Modifier, navController: NavController, authViewModel: AuthViewModel) {
     Box(
         modifier = modifier
             .background(color = DarkBlue)
@@ -96,7 +97,7 @@ fun AccountDetailsView(modifier: Modifier = Modifier, navController: NavControll
                 Spacer(modifier = Modifier.height(30.dp))
                 Button(
                     onClick = {
-                        fbAuth.logoutUser()
+                        authViewModel.logout()
                         navController.navigate("start")
                     },
                     modifier = Modifier

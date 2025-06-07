@@ -42,9 +42,10 @@ import androidx.navigation.NavController
 import hr.ferit.josipnovak.projectrma.ui.FooterEvent
 import hr.ferit.josipnovak.projectrma.R
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
+import hr.ferit.josipnovak.projectrma.viewmodel.EventsViewModel
 
 @Composable
-fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavController) {
+fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavController, eventsViewModel: EventsViewModel) {
     var searchQuery by remember { mutableStateOf("") }
     var distanceToStadium by remember { mutableDoubleStateOf(0.0) }
     Box(
@@ -119,7 +120,7 @@ fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavControll
                 )
 
                 IconButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { navController.navigate("add_event") },
                     modifier = Modifier
                         .size(60.dp)
                         .background(color = Color.White, shape = RoundedCornerShape(15.dp)),

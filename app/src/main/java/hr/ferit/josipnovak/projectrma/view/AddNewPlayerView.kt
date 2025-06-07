@@ -1,5 +1,6 @@
 package hr.ferit.josipnovak.projectrma.view
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,15 +13,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,28 +34,48 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import hr.ferit.josipnovak.projectrma.R
+import hr.ferit.josipnovak.projectrma.model.User
 import hr.ferit.josipnovak.projectrma.ui.FooterPlayers
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
+import hr.ferit.josipnovak.projectrma.viewmodel.PlayersViewModel
 
 @Composable
-fun AddNewPlayerView(modifier: Modifier = Modifier, navController: NavController) {
+fun AddNewPlayerView(modifier: Modifier = Modifier, navController: NavController, playersViewModel: PlayersViewModel) {
     var name by remember { mutableStateOf("") }
     var position by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    var assists by remember { mutableStateOf("") }
     var matchesPlayed by remember { mutableStateOf("") }
     var goals by remember { mutableStateOf("") }
     var trainings by remember { mutableStateOf("") }
+
+    var clubId by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit){
+        playersViewModel.getUserDetails(
+            onSuccess = { fetchedId, fetchedClubIdOrRole, fetchedRole ->
+               if (fetchedRole == "coach") {
+                    clubId = fetchedClubIdOrRole
+               }
+            },
+            onError = { error ->
+
+            }
+        )
+    }
     Box(
         modifier = modifier
             .background(color = DarkBlue)
     ) {
         IconButton(
-            onClick = { /*TODO*/ },
+            onClick = { navController.navigateUp() },
             modifier = Modifier
                 .size(60.dp)
                 .padding(top = 40.dp, start = 10.dp)
@@ -93,25 +118,37 @@ fun AddNewPlayerView(modifier: Modifier = Modifier, navController: NavController
                     shape = RoundedCornerShape(15.dp)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                OutlinedTextField(
-                    value = position,
-                    onValueChange = { position = it },
-                    label = { Text(text = stringResource(id = R.string.position)) },
-                    modifier = Modifier
-                        .width(300.dp)
-                        .height(60.dp),
-                    shape = RoundedCornerShape(15.dp)
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                OutlinedTextField(
-                    value = age,
-                    onValueChange = { age = it },
-                    label = { Text(text = stringResource(id = R.string.age)) },
-                    modifier = Modifier
-                        .width(300.dp)
-                        .height(60.dp),
-                    shape = RoundedCornerShape(15.dp)
-                )
+                Box {
+                    Button(
+                        onClick = { expanded = true },
+                        modifier = Modifier
+                            .width(300.dp)
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Text(
+                            text = if (position.isNotEmpty()) position else "Select position",
+                            color = Color.Black,
+                            fontSize = 16.sp
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        listOf("Goalkeeper", "Defender", "Midfielder", "Attacker").forEach { role ->
+                            DropdownMenuItem(
+                                text = { Text(text = role) },
+                                onClick = {
+                                    position = role
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.height(10.dp))
                 OutlinedTextField(
                     value = matchesPlayed,
@@ -120,7 +157,8 @@ fun AddNewPlayerView(modifier: Modifier = Modifier, navController: NavController
                     modifier = Modifier
                         .width(300.dp)
                         .height(60.dp),
-                    shape = RoundedCornerShape(15.dp)
+                    shape = RoundedCornerShape(15.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 OutlinedTextField(
@@ -130,7 +168,19 @@ fun AddNewPlayerView(modifier: Modifier = Modifier, navController: NavController
                     modifier = Modifier
                         .width(300.dp)
                         .height(60.dp),
-                    shape = RoundedCornerShape(15.dp)
+                    shape = RoundedCornerShape(15.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                OutlinedTextField(
+                    value = assists,
+                    onValueChange = { assists = it },
+                    label = { Text(text = stringResource(id = R.string.assists)) },
+                    modifier = Modifier
+                        .width(300.dp)
+                        .height(60.dp),
+                    shape = RoundedCornerShape(15.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 OutlinedTextField(
@@ -140,11 +190,25 @@ fun AddNewPlayerView(modifier: Modifier = Modifier, navController: NavController
                     modifier = Modifier
                         .width(300.dp)
                         .height(60.dp),
-                    shape = RoundedCornerShape(15.dp)
+                    shape = RoundedCornerShape(15.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
                 Spacer(modifier = Modifier.height(40.dp))
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        val user = User(
+                            name = name,
+                            position = position,
+                            matches = matchesPlayed.toIntOrNull() ?: 0,
+                            goals = goals.toIntOrNull() ?: 0,
+                            assists = assists.toIntOrNull() ?: 0,
+                            trainings = trainings.toIntOrNull() ?: 0,
+                            clubId = clubId,
+                            role = "player",
+                        )
+                        playersViewModel.addNewPlayer(user, clubId)
+                        navController.navigateUp()
+                    },
                     modifier = Modifier
                         .width(125.dp)
                         .height(50.dp),

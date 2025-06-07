@@ -1,10 +1,11 @@
 package hr.ferit.josipnovak.projectrma.model
 
 data class Event(
-    val id: String = "",
+    var id: String = "",
+    val clubId: String = "",
+    val type: String ="",
     val name: String = "",
     val date: String = "",
     val time: String = "",
-    val location: String = "",
-    val clubCode: String = ""
+    val location: Location = Location()
 )
