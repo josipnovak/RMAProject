@@ -1,5 +1,7 @@
 package hr.ferit.josipnovak.projectrma
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -24,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.DataUsage
 import androidx.compose.material.icons.filled.Groups
@@ -57,970 +60,81 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.composable
+import androidx.navigation.NavController
 import hr.ferit.josipnovak.projectrma.ui.theme.D9
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
 import hr.ferit.josipnovak.projectrma.ui.theme.LightBlue
 import hr.ferit.josipnovak.projectrma.ui.theme.ProjectRMATheme
+import hr.ferit.josipnovak.projectrma.view.LoginScreenView
+import hr.ferit.josipnovak.projectrma.view.MainScreenView
+import hr.ferit.josipnovak.projectrma.view.PlayersView
+import hr.ferit.josipnovak.projectrma.view.RegisterCoachView
+import hr.ferit.josipnovak.projectrma.view.RegisterPlayerView
+import java.util.Calendar
+import hr.ferit.josipnovak.projectrma.view.StartScreenView
+import hr.ferit.josipnovak.projectrma.view.UpcomingEventsView
+import hr.ferit.josipnovak.projectrma.view.AccountDetailsView
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val navController = rememberNavController()
+            val fbAuth = FirebaseAuth
+            val startDestination = if (fbAuth.getCurrentUser() != null) "main" else "start"
             ProjectRMATheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
-                }
-            }
-        }
-    }
-}
-
-
-@Composable
-fun StartScreen(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(DarkBlue)
-    ) {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
-            Button(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(75.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                shape = RoundedCornerShape(15.dp)
-            ) {
-                Text(text = stringResource(id = R.string.login), color = Color.Black, fontSize = 20.sp)
-            }
-            Spacer(modifier = Modifier.height(100.dp))
-            Button(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(75.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                shape = RoundedCornerShape(15.dp)
-            ) {
-                Text(text = stringResource(id = R.string.register), color = Color.Black, fontSize = 20.sp)
-            }
-        }
-    }
-}
-
-@Composable
-fun LoginScreen(modifier: Modifier = Modifier) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(DarkBlue)
-    ) {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text(text = stringResource(id = R.string.email)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp),
-                shape = RoundedCornerShape(15.dp)
-            )
-
-            Spacer(modifier = Modifier.height(50.dp))
-
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text(text = stringResource(id = R.string.password)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp)
-                    .background(color = DarkBlue),
-                shape = RoundedCornerShape(15.dp),
-                visualTransformation = if(passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
-                    val image = if(passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                    val description = if(passwordVisible) "Hide password" else "Show password"
-                    IconButton(
-                        onClick = { passwordVisible = !passwordVisible },
+                    NavHost(navController = navController, startDestination = startDestination,
+                        modifier = Modifier.padding(bottom = 25.dp)
                     ) {
-                        Icon(imageVector = image, contentDescription = description, tint = Color.White)
+                        composable("start") { StartScreenView(modifier = Modifier.padding(bottom = 25.dp), navController = navController) }
+                        composable("login") { LoginScreenView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, fbAuth = fbAuth) }
+                        composable("register_coach") { RegisterCoachView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, fbAuth = fbAuth) }
+                        composable("register_player") { RegisterPlayerView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, fbAuth = fbAuth) }
+                        composable("main") { MainScreenView(modifier = Modifier.padding(bottom = 25.dp), navController = navController) }
+                        composable("upcoming_events") { UpcomingEventsView(modifier = Modifier.padding(bottom = 25.dp), navController = navController) }
+                        composable("players") { PlayersView(modifier = Modifier.padding(bottom = 25.dp), navController = navController) }
+                        composable("account_details") { AccountDetailsView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, fbAuth = fbAuth) }
                     }
                 }
-            )
-
-            Spacer(modifier = Modifier.height(100.dp))
-
-            Button(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(75.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                shape = RoundedCornerShape(15.dp)
-            ) {
-                Text(
-                    text = stringResource(id = R.string.login),
-                    color = Color.Black,
-                    fontSize = 20.sp
-                )
             }
         }
     }
 }
 
 @Composable
-fun RegisterScreen(modifier: Modifier = Modifier) {
-    var isCoach by remember { mutableStateOf(true) }
-
-    if(isCoach) {
-        RegisterCoach(modifier = modifier)
-    } else {
-        RegisterPlayer(modifier = modifier)
-    }
-}
-
-@Composable
-fun RegisterCoach(modifier: Modifier = Modifier) {
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
-    var password1 by remember { mutableStateOf("") }
-    var password1Visible by remember { mutableStateOf(false) }
-    var teamName by remember { mutableStateOf("") }
-
-
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(DarkBlue)
-    ) {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                modifier = modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Button(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier
-                        .width(135.dp)
-                        .height(45.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                    shape = RoundedCornerShape(15.dp)
-                ) {
-                    Text(text = stringResource(id = R.string.coach), color = Color.Black, fontSize = 20.sp)
-                }
-
-                Spacer(modifier = Modifier.width(30.dp))
-
-                OutlinedButton(
-                    onClick = { /*TODO*/  },
-                    modifier = Modifier
-                        .width(135.dp)
-                        .height(45.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = DarkBlue),
-                    shape = RoundedCornerShape(15.dp)
-                ) {
-                    Text(text = stringResource(id = R.string.player), color = Color.White, fontSize = 20.sp)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(30.dp))
-            
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text(text = stringResource(id = R.string.name)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp),
-                shape = RoundedCornerShape(15.dp)
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text(text = stringResource(id = R.string.email)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp),
-                shape = RoundedCornerShape(15.dp)
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text(text = stringResource(id = R.string.password)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp)
-                    .background(color = DarkBlue),
-                shape = RoundedCornerShape(15.dp),
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
-                    val image = if (passwordVisible) {
-                        Icons.Filled.Visibility
-                    } else {
-                        Icons.Filled.VisibilityOff
-                    }
-                    val description = if (passwordVisible) "Hide password" else "Show password"
-                    IconButton(
-                        onClick = { passwordVisible = !passwordVisible },
-                    ) {
-                        Icon(
-                            imageVector = image,
-                            contentDescription = description,
-                            tint = Color.White
-                        )
-                    }
-                }
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            OutlinedTextField(
-                value = password1,
-                onValueChange = { password1 = it },
-                label = { Text(text = stringResource(id = R.string.confirm_password)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp)
-                    .background(color = DarkBlue),
-                shape = RoundedCornerShape(15.dp),
-                visualTransformation =
-                    if (password1Visible) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon =
-                    {
-                        val image =
-                            if (password1Visible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                        val description =
-                            if (password1Visible) "Hide password" else "Show password"
-                        IconButton(
-                            onClick = { password1Visible = !password1Visible },
-                        ) {
-                            Icon(
-                                imageVector = image,
-                                contentDescription = description,
-                                tint = Color.White
-                            )
-                        }
-                    }
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            OutlinedTextField(
-                value = teamName,
-                onValueChange = { teamName = it },
-                label = { Text(text = stringResource(id = R.string.team_name)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp),
-                shape = RoundedCornerShape(15.dp)
-            )
-
-            Spacer(modifier = Modifier.height(100.dp))
-
-            Button(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(75.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                shape = RoundedCornerShape(15.dp)
-            ) {
-                Text(
-                    text = stringResource(id = R.string.register),
-                    color = Color.Black,
-                    fontSize = 20.sp
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun RegisterPlayer(modifier: Modifier = Modifier) {
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
-    var password1 by remember { mutableStateOf("") }
-    var password1Visible by remember { mutableStateOf(false) }
-    var teamCode by remember { mutableStateOf("") }
-
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(DarkBlue)
-    ){
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                modifier = modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                OutlinedButton(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier
-                        .width(135.dp)
-                        .height(45.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = DarkBlue),
-                    shape = RoundedCornerShape(15.dp)
-                ) {
-                    Text(text = stringResource(id = R.string.coach), color = Color.White, fontSize = 20.sp)
-                }
-
-                Spacer(modifier = Modifier.width(30.dp))
-
-                Button(
-                    onClick = { /*TODO*/  },
-                    modifier = Modifier
-                        .width(135.dp)
-                        .height(45.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                    shape = RoundedCornerShape(15.dp)
-                ) {
-                    Text(text = stringResource(id = R.string.player), color = Color.Black, fontSize = 20.sp)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text(text = stringResource(id = R.string.name)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp),
-                shape = RoundedCornerShape(15.dp)
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text(text = stringResource(id = R.string.email)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp),
-                shape = RoundedCornerShape(15.dp)
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text(text = stringResource(id = R.string.password)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp)
-                    .background(color = DarkBlue),
-                shape = RoundedCornerShape(15.dp),
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
-                    val image = if (passwordVisible) {
-                        Icons.Filled.Visibility
-                    } else {
-                        Icons.Filled.VisibilityOff
-                    }
-                    val description = if (passwordVisible) "Hide password" else "Show password"
-                    IconButton(
-                        onClick = { passwordVisible = !passwordVisible },
-                    ) {
-                        Icon(
-                            imageVector = image,
-                            contentDescription = description,
-                            tint = Color.White
-                        )
-                    }
-                }
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            OutlinedTextField(
-                value = password1,
-                onValueChange = { password1 = it },
-                label = { Text(text = stringResource(id = R.string.confirm_password)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp)
-                    .background(color = DarkBlue),
-                shape = RoundedCornerShape(15.dp),
-                visualTransformation =
-                    if (password1Visible) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon =
-                    {
-                        val image =
-                            if (password1Visible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                        val description =
-                            if (password1Visible) "Hide password" else "Show password"
-                        IconButton(
-                            onClick = { password1Visible = !password1Visible },
-                        ) {
-                            Icon(
-                                imageVector = image,
-                                contentDescription = description,
-                                tint = Color.White
-                            )
-                        }
-                    }
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            OutlinedTextField(
-                value = teamCode,
-                onValueChange = { teamCode = it },
-                label = { Text(text = stringResource(id = R.string.team_code)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp),
-                shape = RoundedCornerShape(15.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
-
-            Spacer(modifier = Modifier.height(100.dp))
-
-            Button(
-                onClick = { /*TODO*/ },
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(75.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                shape = RoundedCornerShape(15.dp)
-            ) {
-                Text(
-                    text = stringResource(id = R.string.register),
-                    color = Color.Black,
-                    fontSize = 20.sp
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun MainScreen(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(color = DarkBlue)
-    )
-    {
-        Column(
-            modifier = modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = stringResource(R.string.welcome, "Ime"),
-                color = Color.White,
-                fontSize = 30.sp,
-                modifier = Modifier.padding(top = 40.dp)
-            )
-            Column(
-                modifier = modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Card(
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    modifier = Modifier
-                        .width(300.dp)
-                        .height(225.dp)
-                        .padding(vertical = 8.dp)
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
-                        modifier = Modifier
-                            .padding(20.dp)
-                            .fillMaxSize()
-                    ) {
-                        Text("Weekly summary", fontSize = 20.sp, color = Color.Black)
-                        Spacer(Modifier.height(12.dp))
-                        Text("2 trainings", fontSize = 16.sp)
-                        Spacer(Modifier.height(8.dp))
-                        Text("1 match", fontSize = 16.sp)
-                    }
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-                Card(
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    modifier = Modifier
-                        .width(300.dp)
-                        .height(300.dp)
-                        .padding(vertical = 8.dp)
-                ) {
-                    Column(
-                        modifier = modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            text = stringResource(R.string.best_players),
-                            color = Color.Black,
-                            fontSize = 22.sp
-                        )
-                        Spacer(modifier = Modifier.height(20.dp))
-                        Row(
-                            modifier = modifier
-                                .width(250.dp)
-                                .height(40.dp)
-                                .background(color = LightBlue)
-                                .padding(horizontal = 10.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(text = "Ime prezime", color = Color.Black, fontSize = 18.sp)
-                            Text(text = "25/5", color = Color.Black, fontSize = 18.sp)
-                        }
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Row(
-                            modifier = modifier
-                                .width(250.dp)
-                                .height(40.dp)
-                                .background(color = LightBlue)
-                                .padding(horizontal = 10.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(text = "Ime prezime", color = Color.Black, fontSize = 18.sp)
-                            Text(text = "25/5", color = Color.Black, fontSize = 18.sp)
-                        }
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Row(
-                            modifier = modifier
-                                .width(250.dp)
-                                .height(40.dp)
-                                .background(color = LightBlue)
-                                .padding(horizontal = 10.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(text = "Ime prezime", color = Color.Black, fontSize = 18.sp)
-                            Text(text = "25/5", color = Color.Black, fontSize = 18.sp)
-                        }
-                    }
-                }
-            }
-            FooterHome()
-        }
-    }
-}
-
-@Composable
-fun UpcomingEvents(modifier: Modifier = Modifier) {
-    var searchQuery by remember { mutableStateOf("") }
-    var distanceToStadium by remember { mutableDoubleStateOf(0.0) }
-    Box(
-        modifier = modifier
-            .background(color = DarkBlue)
-    )
-    {
-        Column(
-            modifier = modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = stringResource(R.string.upcoming_events),
-                color = Color.White,
-                fontSize = 30.sp,
-                modifier = Modifier.padding(top = 40.dp)
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            Row(
-                modifier = Modifier
-                    .width(350.dp)
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                TextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    label = { Text(text = stringResource(id = R.string.search)) },
-                    modifier = Modifier
-                        .width(225.dp)
-                        .height(60.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color.Black,
-                        unfocusedIndicatorColor = Color.Black,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        cursorColor = Color.Black,
-                        focusedLabelColor = Color.Black,
-                        unfocusedLabelColor = Color.Black,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black
-                    ),
-                    shape = RoundedCornerShape(15.dp),
-                    trailingIcon = {
-                        IconButton(
-                            onClick = { /*TODO*/ },
-                        ) {
-                            Icon(imageVector = Icons.Filled.Search, contentDescription = null, tint = Color.Black)
-                        }
-                    }
-                )
-
-                IconButton(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier
-                        .size(60.dp)
-                        .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = null,
-                        tint = Color.Black,
-                        modifier = Modifier
-                    )
-                }
-
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            LazyColumn(
-                modifier = Modifier
-                    .width(350.dp)
-                    .weight(1f)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                items(10) { index ->
-                    Card(
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(220.dp)
-                            .padding(vertical = 8.dp),
-                        onClick = { /*TODO*/ }
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = "Name of the event $index",
-                                fontSize = 20.sp,
-                                color = Color.Black,
-                                modifier = Modifier
-                            )
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Text(
-                                text = "HH:MM",
-                                fontSize = 16.sp,
-                                color = Color.Gray,
-                                modifier = Modifier
-                            )
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Text(
-                                text = "Day, 27. May",
-                                fontSize = 16.sp,
-                                color = Color.Gray,
-                                modifier = Modifier
-                            )
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Text(
-                                text = "Stadium Name, $distanceToStadium km away",
-                                fontSize = 16.sp,
-                                color = Color.Gray,
-                                modifier = Modifier
-                            )
-                        }
-                    }
-                }
-            }
-            FooterEvent()
-        }
-    }
-}
-
-@Composable
-fun Players(modifier: Modifier = Modifier) {
-    var searchQuery by remember { mutableStateOf("") }
-    val players = mapOf(
-        "Goalkeepers" to listOf("Player 1" to 0, "Player 2" to 0),
-        "Defenders" to listOf("Player 3" to 7, "Player 4" to 5),
-        "Midfielders" to listOf("Player 5" to 5, "Player 6" to 14),
-        "Forwards" to listOf("Player 7" to 28, "Player 8" to 25)
-    )
-    Box(
-        modifier = modifier
-            .background(color = DarkBlue)
-    )
-    {
-        Column(
-            modifier = modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = stringResource(R.string.players),
-                color = Color.White,
-                fontSize = 30.sp,
-                modifier = Modifier.padding(top = 40.dp)
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            Row(
-                modifier = Modifier
-                    .width(350.dp)
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                TextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    label = { Text(text = stringResource(id = R.string.search)) },
-                    modifier = Modifier
-                        .width(225.dp)
-                        .height(60.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color.Black,
-                        unfocusedIndicatorColor = Color.Black,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        cursorColor = Color.Black,
-                        focusedLabelColor = Color.Black,
-                        unfocusedLabelColor = Color.Black,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black
-                    ),
-                    shape = RoundedCornerShape(15.dp),
-                    trailingIcon = {
-                        IconButton(
-                            onClick = { /*TODO*/ },
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Search,
-                                contentDescription = null,
-                                tint = Color.Black
-                            )
-                        }
-                    }
-                )
-
-                IconButton(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier
-                        .size(60.dp)
-                        .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = null,
-                        tint = Color.Black,
-                        modifier = Modifier
-                    )
-                }
-            }
-
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            LazyColumn(
-                modifier = Modifier
-                    .width(350.dp)
-                    .weight(1f)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                players.forEach { (position, playerList) ->
-                    item {
-                        Text(
-                            text = position,
-                            fontSize = 24.sp,
-                            color = Color.White,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                    }
-                    items(playerList.size) { it ->
-                        Card(
-                            shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(containerColor = LightBlue),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(80.dp)
-                                .padding(vertical = 8.dp),
-                            onClick = { /*TODO*/ }
-                        ) {
-                            /*TODO mozda dodaj slike ispred svakog igraca*/
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                verticalArrangement = Arrangement.Top
-                            ) {
-                                Text(
-                                    text = playerList[it].first,
-                                    fontSize = 18.sp,
-                                    color = Color.White,
-                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "Age: ${playerList[it].second}",
-                                    fontSize = 14.sp,
-                                    color = Color.White,
-                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-            FooterPlayers()
-        }
-    }
-}
-
-@Preview(showBackground = true, locale= "en")
-@Composable
-fun AccountDetails(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .background(color = DarkBlue)
-    ) {
-        Column(
-            modifier = modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
-        )
-        {
-            Column(
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(R.string.account_details),
-                    color = Color.White,
-                    fontSize = 30.sp,
-                    modifier = Modifier.padding(top = 40.dp)
-                )
-                Spacer(modifier = Modifier.height(40.dp))
-                Text(
-                    text = "Name",
-                    color = Color.White,
-                    fontSize = 30.sp,
-                    modifier = Modifier.padding(top = 40.dp)
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    text = "Club name",
-                    color = Color.White,
-                    fontSize = 30.sp,
-                    modifier = Modifier.padding(top = 40.dp)
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    text = "Coach/Player",
-                    color = Color.White,
-                    fontSize = 30.sp,
-                    modifier = Modifier.padding(top = 40.dp)
-                )
-                Spacer(modifier = Modifier.height(30.dp))
-                Button(
-                    onClick = { /*TODO*/ },
-                    modifier = Modifier
-                        .width(125.dp)
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                    shape = RoundedCornerShape(15.dp)
-                ) {
-                    Text(
-                        text = "Logout",
-                        color = Color.Black,
-                        fontSize = 20.sp
-                    )
-                }
-            }
-            FooterUser()
-        }
-    }
-}
-
-@Composable
-fun FooterHome(modifier: Modifier = Modifier) {
+fun FooterHome(modifier: Modifier = Modifier, navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
             .padding(0.dp),
-        horizontalArrangement = Arrangement.SpaceAround,
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         listOf(
-            Icons.Filled.Home,
-            Icons.Filled.Notifications,
-            Icons.Filled.CalendarToday,
-            Icons.Filled.Groups,
-            Icons.Filled.Settings
-        ).forEachIndexed { index, icon ->
+            Icons.Filled.Home to "main",
+            Icons.Filled.Notifications to "upcoming_events",
+            Icons.Filled.Groups to "players",
+            Icons.Filled.Settings to "account_details"
+        ).forEachIndexed { index, (icon, route) ->
             val isSelected = index == 0
-            IconButton(onClick = { /* TODO */ }) {
+            IconButton(onClick = { navController.navigate(route) }) {
                 Box(
                     modifier = if (isSelected) Modifier
                         .size(50.dp)
@@ -1040,24 +154,23 @@ fun FooterHome(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun FooterEvent(modifier: Modifier = Modifier) {
+fun FooterEvent(modifier: Modifier = Modifier, navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
             .padding(0.dp),
-        horizontalArrangement = Arrangement.SpaceAround,
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         listOf(
-            Icons.Filled.Home,
-            Icons.Filled.Notifications,
-            Icons.Filled.CalendarToday,
-            Icons.Filled.Groups,
-            Icons.Filled.Settings
-        ).forEachIndexed { index, icon ->
+            Icons.Filled.Home to "main",
+            Icons.Filled.Notifications to "upcoming_events",
+            Icons.Filled.Groups to "players",
+            Icons.Filled.Settings to "account_details"
+        ).forEachIndexed { index, (icon, route) ->
             val isSelected = index == 1
-            IconButton(onClick = { /* TODO */ }) {
+            IconButton(onClick = { navController.navigate(route) }) {
                 Box(
                     modifier = if (isSelected) Modifier
                         .size(50.dp)
@@ -1077,24 +190,23 @@ fun FooterEvent(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun FooterCalendar(modifier: Modifier = Modifier) {
+fun FooterPlayers(modifier: Modifier = Modifier, navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
             .padding(0.dp),
-        horizontalArrangement = Arrangement.SpaceAround,
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         listOf(
-            Icons.Filled.Home,
-            Icons.Filled.Notifications,
-            Icons.Filled.CalendarToday,
-            Icons.Filled.Groups,
-            Icons.Filled.Settings
-        ).forEachIndexed { index, icon ->
+            Icons.Filled.Home to "main",
+            Icons.Filled.Notifications to "upcoming_events",
+            Icons.Filled.Groups to "players",
+            Icons.Filled.Settings to "account_details"
+        ).forEachIndexed { index, (icon, route) ->
             val isSelected = index == 2
-            IconButton(onClick = { /* TODO */ }) {
+            IconButton(onClick = { navController.navigate(route) }) {
                 Box(
                     modifier = if (isSelected) Modifier
                         .size(50.dp)
@@ -1114,24 +226,23 @@ fun FooterCalendar(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun FooterPlayers(modifier: Modifier = Modifier) {
+fun FooterUser(modifier: Modifier = Modifier, navController: NavController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
             .padding(0.dp),
-        horizontalArrangement = Arrangement.SpaceAround,
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         listOf(
-            Icons.Filled.Home,
-            Icons.Filled.Notifications,
-            Icons.Filled.CalendarToday,
-            Icons.Filled.Groups,
-            Icons.Filled.Settings
-        ).forEachIndexed { index, icon ->
+            Icons.Filled.Home to "main",
+            Icons.Filled.Notifications to "upcoming_events",
+            Icons.Filled.Groups to "players",
+            Icons.Filled.Settings to "account_details"
+        ).forEachIndexed { index, (icon, route) ->
             val isSelected = index == 3
-            IconButton(onClick = { /* TODO */ }) {
+            IconButton(onClick = { navController.navigate(route) }) {
                 Box(
                     modifier = if (isSelected) Modifier
                         .size(50.dp)
@@ -1150,43 +261,749 @@ fun FooterPlayers(modifier: Modifier = Modifier) {
     }
 }
 
-@Composable
-fun FooterUser(modifier: Modifier = Modifier) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White)
-            .padding(0.dp),
-        horizontalArrangement = Arrangement.SpaceAround,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        listOf(
-            Icons.Filled.Home,
-            Icons.Filled.Notifications,
-            Icons.Filled.CalendarToday,
-            Icons.Filled.Groups,
-            Icons.Filled.Settings
-        ).forEachIndexed { index, icon ->
-            val isSelected = index == 4
-            IconButton(onClick = { /* TODO */ }) {
-                Box(
-                    modifier = if (isSelected) Modifier
-                        .size(50.dp)
-                        .background(DarkBlue, shape = RectangleShape) else Modifier
-                ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        tint = if (isSelected) Color.White else Color.Black,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-            }
-
-        }
-    }
-}
-
-
-
-
+//@Composable
+//fun EventDetails(modifier: Modifier = Modifier) {
+//    Box(
+//        modifier = modifier
+//            .background(color = DarkBlue)
+//    ) {
+//        IconButton(
+//            onClick = { /*TODO*/ },
+//            modifier = Modifier
+//                .size(60.dp)
+//                .padding(top = 40.dp, start = 10.dp)
+//                .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
+//        ) {
+//            Icon(
+//                imageVector = Icons.Filled.ArrowBack,
+//                contentDescription = null,
+//                tint = Color.Black,
+//                modifier = Modifier
+//            )
+//        }
+//        Column(
+//            modifier = modifier.fillMaxSize(),
+//            verticalArrangement = Arrangement.SpaceBetween,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        )
+//        {
+//            Column(
+//                verticalArrangement = Arrangement.Top,
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ) {
+//                Text(
+//                    text = stringResource(R.string.event_details),
+//                    color = Color.White,
+//                    fontSize = 30.sp,
+//                    textAlign = TextAlign.Center,
+//                    modifier = Modifier
+//                        .padding(top = 40.dp, start = 50.dp, end = 50.dp)
+//                        .fillMaxWidth()
+//                )
+//                Spacer(modifier = Modifier.height(40.dp))
+//                Text(
+//                    text = "Name",
+//                    color = Color.White,
+//                    fontSize = 30.sp,
+//                    modifier = Modifier.padding(top = 40.dp)
+//                )
+//                Spacer(modifier = Modifier.height(20.dp))
+//                Text(
+//                    text = "Time",
+//                    color = Color.White,
+//                    fontSize = 30.sp,
+//                    modifier = Modifier.padding(top = 40.dp)
+//                )
+//                Spacer(modifier = Modifier.height(20.dp))
+//                Text(
+//                    text = "Date",
+//                    color = Color.White,
+//                    fontSize = 30.sp,
+//                    modifier = Modifier.padding(top = 40.dp)
+//                )
+//                Spacer(modifier = Modifier.height(20.dp))
+//                Text(
+//                    text = "Location",
+//                    color = Color.White,
+//                    fontSize = 30.sp,
+//                    modifier = Modifier.padding(top = 40.dp)
+//                )
+//                Spacer(modifier = Modifier.height(40.dp))
+//                Row() {
+//                    Button(
+//                        onClick = { /*TODO*/ },
+//                        modifier = Modifier
+//                            .width(125.dp)
+//                            .height(50.dp),
+//                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+//                        shape = RoundedCornerShape(15.dp)
+//                    ) {
+//                        Text(
+//                            text = stringResource(R.string.delete),
+//                            color = Color.Black,
+//                            fontSize = 20.sp
+//                        )
+//                    }
+//                    Spacer(modifier = Modifier.width(20.dp))
+//                    Button(
+//                        onClick = { /*TODO*/ },
+//                        modifier = Modifier
+//                            .width(125.dp)
+//                            .height(50.dp),
+//                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+//                        shape = RoundedCornerShape(15.dp)
+//                    ) {
+//                        Text(
+//                            text = stringResource(R.string.edit),
+//                            color = Color.Black,
+//                            fontSize = 20.sp
+//                        )
+//                    }
+//                }
+//            }
+//            FooterEvent()
+//        }
+//    }
+//}
+//
+//@Composable
+//fun AddNewEvent(modifier: Modifier = Modifier) {
+//    var eventName by remember { mutableStateOf("") }
+//    var eventDate by remember { mutableStateOf("") }
+//    var eventTime by remember { mutableStateOf("") }
+//    var eventLocation by remember { mutableStateOf("") }
+//
+//    val context = LocalContext.current
+//    val calendar = Calendar.getInstance()
+//
+//    val datePickerDialog = DatePickerDialog(
+//        context,
+//        { _, year, month, dayOfMonth ->
+//            eventDate = "$dayOfMonth/${month + 1}/$year"
+//        },
+//        calendar.get(Calendar.YEAR),
+//        calendar.get(Calendar.MONTH),
+//        calendar.get(Calendar.DAY_OF_MONTH)
+//    )
+//
+//    val timePickerDialog = TimePickerDialog(
+//        context,
+//        { _, hourOfDay, minute ->
+//            eventTime = String.format("%02d:%02d", hourOfDay, minute)
+//        },
+//        calendar.get(Calendar.HOUR_OF_DAY),
+//        calendar.get(Calendar.MINUTE),
+//        true
+//    )
+//
+//    Box(
+//        modifier = modifier
+//            .background(color = DarkBlue)
+//    ) {
+//        IconButton(
+//            onClick = { /*TODO*/ },
+//            modifier = Modifier
+//                .size(60.dp)
+//                .padding(top = 40.dp, start = 20.dp)
+//                .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
+//        ) {
+//            Icon(
+//                imageVector = Icons.Filled.ArrowBack,
+//                contentDescription = null,
+//                tint = Color.Black,
+//                modifier = Modifier.size(24.dp)
+//            )
+//        }
+//        Column(
+//            modifier = modifier.fillMaxSize(),
+//            verticalArrangement = Arrangement.SpaceBetween,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            Column(
+//                verticalArrangement = Arrangement.Top,
+//                horizontalAlignment = Alignment.CenterHorizontally,
+//            ) {
+//                Text(
+//                    text = stringResource(R.string.add_new_event),
+//                    color = Color.White,
+//                    fontSize = 30.sp,
+//                    textAlign = TextAlign.Center,
+//                    modifier = Modifier
+//                        .padding(top = 40.dp, start = 50.dp, end = 50.dp)
+//                        .fillMaxWidth()
+//                )
+//                Spacer(modifier = Modifier.height(40.dp))
+//
+//                OutlinedTextField(
+//                    value = eventName,
+//                    onValueChange = { eventName = it },
+//                    label = { Text(text = stringResource(id = R.string.event_name)) },
+//                    modifier = Modifier
+//                        .width(300.dp)
+//                        .height(60.dp),
+//                    shape = RoundedCornerShape(15.dp)
+//                )
+//
+//                Spacer(modifier = Modifier.height(20.dp))
+//
+//                Button(
+//                    onClick = { datePickerDialog.show() },
+//                    modifier = Modifier
+//                        .width(200.dp)
+//                        .height(50.dp),
+//                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+//                    shape = RoundedCornerShape(15.dp)
+//                ) {
+//                    Text(
+//                        text = if (eventDate.isEmpty()) stringResource(R.string.pick_date) else eventDate,
+//                        color = Color.Black,
+//                        fontSize = 16.sp
+//                    )
+//                }
+//
+//                Spacer(modifier = Modifier.height(20.dp))
+//
+//                Button(
+//                    onClick = { timePickerDialog.show() },
+//                    modifier = Modifier
+//                        .width(200.dp)
+//                        .height(50.dp),
+//                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+//                    shape = RoundedCornerShape(15.dp)
+//                ) {
+//                    Text(
+//                        text = if (eventTime.isEmpty()) stringResource(R.string.pick_time) else eventTime,
+//                        color = Color.Black,
+//                        fontSize = 16.sp
+//                    )
+//                }
+//
+//                Spacer(modifier = Modifier.height(20.dp))
+//
+//                /*TODO LOCATION PICKER*/
+//
+//                Spacer(modifier = Modifier.height(40.dp))
+//
+//                Button(
+//                    onClick = { /*TODO*/ },
+//                    modifier = Modifier
+//                        .width(150.dp)
+//                        .height(40.dp),
+//                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+//                    shape = RoundedCornerShape(15.dp)
+//                ) {
+//                    Text(
+//                        text = stringResource(R.string.add),
+//                        color = Color.Black,
+//                        fontSize = 20.sp
+//                    )
+//                }
+//            }
+//            FooterEvent()
+//        }
+//    }
+//}
+//
+//@Composable
+//fun EditEvent(modifier: Modifier = Modifier) {
+//    var eventName by remember { mutableStateOf("") }
+//    var eventDate by remember { mutableStateOf("") }
+//    var eventTime by remember { mutableStateOf("") }
+//    var eventLocation by remember { mutableStateOf("") }
+//
+//    val context = LocalContext.current
+//    val calendar = Calendar.getInstance()
+//
+//    val datePickerDialog = DatePickerDialog(
+//        context,
+//        { _, year, month, dayOfMonth ->
+//            eventDate = "$dayOfMonth/${month + 1}/$year"
+//        },
+//        calendar.get(Calendar.YEAR),
+//        calendar.get(Calendar.MONTH),
+//        calendar.get(Calendar.DAY_OF_MONTH)
+//    )
+//
+//    val timePickerDialog = TimePickerDialog(
+//        context,
+//        { _, hourOfDay, minute ->
+//            eventTime = String.format("%02d:%02d", hourOfDay, minute)
+//        },
+//        calendar.get(Calendar.HOUR_OF_DAY),
+//        calendar.get(Calendar.MINUTE),
+//        true
+//    )
+//
+//    Box(
+//        modifier = modifier
+//            .background(color = DarkBlue)
+//    ) {
+//        IconButton(
+//            onClick = { /*TODO*/ },
+//            modifier = Modifier
+//                .size(60.dp)
+//                .padding(top = 40.dp, start = 20.dp)
+//                .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
+//        ) {
+//            Icon(
+//                imageVector = Icons.Filled.ArrowBack,
+//                contentDescription = null,
+//                tint = Color.Black,
+//                modifier = Modifier.size(24.dp)
+//            )
+//        }
+//        Column(
+//            modifier = modifier.fillMaxSize(),
+//            verticalArrangement = Arrangement.SpaceBetween,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            Column(
+//                verticalArrangement = Arrangement.Top,
+//                horizontalAlignment = Alignment.CenterHorizontally,
+//            ) {
+//                Text(
+//                    text = stringResource(R.string.add_new_event),
+//                    color = Color.White,
+//                    fontSize = 30.sp,
+//                    textAlign = TextAlign.Center,
+//                    modifier = Modifier
+//                        .padding(top = 40.dp, start = 50.dp, end = 50.dp)
+//                        .fillMaxWidth()
+//                )
+//                Spacer(modifier = Modifier.height(40.dp))
+//
+//                OutlinedTextField(
+//                    value = eventName,
+//                    onValueChange = { eventName = it },
+//                    label = { Text(text = stringResource(id = R.string.event_name)) },
+//                    modifier = Modifier
+//                        .width(300.dp)
+//                        .height(60.dp),
+//                    shape = RoundedCornerShape(15.dp)
+//                )
+//
+//                Spacer(modifier = Modifier.height(20.dp))
+//
+//                Button(
+//                    onClick = { datePickerDialog.show() },
+//                    modifier = Modifier
+//                        .width(200.dp)
+//                        .height(50.dp),
+//                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+//                    shape = RoundedCornerShape(15.dp)
+//                ) {
+//                    Text(
+//                        text = if (eventDate.isEmpty()) stringResource(R.string.pick_date) else eventDate,
+//                        color = Color.Black,
+//                        fontSize = 16.sp
+//                    )
+//                }
+//
+//                Spacer(modifier = Modifier.height(20.dp))
+//
+//                Button(
+//                    onClick = { timePickerDialog.show() },
+//                    modifier = Modifier
+//                        .width(200.dp)
+//                        .height(50.dp),
+//                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+//                    shape = RoundedCornerShape(15.dp)
+//                ) {
+//                    Text(
+//                        text = if (eventTime.isEmpty()) stringResource(R.string.pick_time) else eventTime,
+//                        color = Color.Black,
+//                        fontSize = 16.sp
+//                    )
+//                }
+//
+//                Spacer(modifier = Modifier.height(20.dp))
+//
+//                /*TODO LOCATION PICKER*/
+//
+//                Spacer(modifier = Modifier.height(40.dp))
+//
+//                Button(
+//                    onClick = { /*TODO*/ },
+//                    modifier = Modifier
+//                        .width(150.dp)
+//                        .height(40.dp),
+//                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+//                    shape = RoundedCornerShape(15.dp)
+//                ) {
+//                    Text(
+//                        text = stringResource(R.string.add),
+//                        color = Color.Black,
+//                        fontSize = 20.sp
+//                    )
+//                }
+//            }
+//            FooterEvent()
+//        }
+//    }
+//}
+//
+//@Composable
+//fun PlayerDetails(modifier: Modifier = Modifier) {
+//    Box(
+//        modifier = modifier
+//            .background(color = DarkBlue)
+//    ) {
+//        IconButton(
+//            onClick = { /*TODO*/ },
+//            modifier = Modifier
+//                .size(60.dp)
+//                .padding(top = 40.dp, start = 10.dp)
+//                .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
+//        ) {
+//            Icon(
+//                imageVector = Icons.Filled.ArrowBack,
+//                contentDescription = null,
+//                tint = Color.Black,
+//                modifier = Modifier
+//            )
+//        }
+//        Column(
+//            modifier = modifier.fillMaxSize(),
+//            verticalArrangement = Arrangement.SpaceBetween,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        )
+//        {
+//            Column(
+//                verticalArrangement = Arrangement.Top,
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ) {
+//                Text(
+//                    text = stringResource(R.string.player_details),
+//                    color = Color.White,
+//                    fontSize = 30.sp,
+//                    textAlign = TextAlign.Center,
+//                    modifier = Modifier
+//                        .padding(top = 40.dp, start = 50.dp, end = 50.dp)
+//                        .fillMaxWidth()
+//                )
+//                Spacer(modifier = Modifier.height(40.dp))
+//                Text(
+//                    text = "Name",
+//                    color = Color.White,
+//                    fontSize = 30.sp,
+//                    modifier = Modifier.padding(top = 40.dp)
+//                )
+//                Text(
+//                    text = "Position",
+//                    color = Color.White,
+//                    fontSize = 30.sp,
+//                    modifier = Modifier.padding(top = 40.dp)
+//                )
+//                Text(
+//                    text = "Age",
+//                    color = Color.White,
+//                    fontSize = 30.sp,
+//                    modifier = Modifier.padding(top = 40.dp)
+//                )
+//                Text(
+//                    text = "Matches Played",
+//                    color = Color.White,
+//                    fontSize = 30.sp,
+//                    modifier = Modifier.padding(top = 40.dp)
+//                )
+//                Text(
+//                    text = "Goals",
+//                    color = Color.White,
+//                    fontSize = 30.sp,
+//                    modifier = Modifier.padding(top = 40.dp)
+//                )
+//                Text(
+//                    text = "Trainings",
+//                    color = Color.White,
+//                    fontSize = 30.sp,
+//                    modifier = Modifier.padding(top = 40.dp)
+//                )
+//                Spacer(modifier = Modifier.height(40.dp))
+//                Row() {
+//                    Button(
+//                        onClick = { /*TODO*/ },
+//                        modifier = Modifier
+//                            .width(125.dp)
+//                            .height(50.dp),
+//                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+//                        shape = RoundedCornerShape(15.dp)
+//                    ) {
+//                        Text(
+//                            text = stringResource(R.string.delete),
+//                            color = Color.Black,
+//                            fontSize = 20.sp
+//                        )
+//                    }
+//                    Spacer(modifier = Modifier.width(20.dp))
+//                    Button(
+//                        onClick = { /*TODO*/ },
+//                        modifier = Modifier
+//                            .width(125.dp)
+//                            .height(50.dp),
+//                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+//                        shape = RoundedCornerShape(15.dp)
+//                    ) {
+//                        Text(
+//                            text = stringResource(R.string.edit),
+//                            color = Color.Black,
+//                            fontSize = 20.sp
+//                        )
+//                    }
+//                }
+//            }
+//            FooterPlayers()
+//        }
+//    }
+//}
+//
+//@Composable
+//fun EditPlayer(modifier: Modifier = Modifier) {
+//    var name by remember { mutableStateOf("") }
+//    var position by remember { mutableStateOf("") }
+//    var age by remember { mutableStateOf("") }
+//    var matchesPlayed by remember { mutableStateOf("") }
+//    var goals by remember { mutableStateOf("") }
+//    var trainings by remember { mutableStateOf("") }
+//    Box(
+//        modifier = modifier
+//            .background(color = DarkBlue)
+//    ) {
+//        IconButton(
+//            onClick = { /*TODO*/ },
+//            modifier = Modifier
+//                .size(60.dp)
+//                .padding(top = 40.dp, start = 10.dp)
+//                .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
+//        ) {
+//            Icon(
+//                imageVector = Icons.Filled.ArrowBack,
+//                contentDescription = null,
+//                tint = Color.Black,
+//                modifier = Modifier
+//            )
+//        }
+//        Column(
+//            modifier = modifier.fillMaxSize(),
+//            verticalArrangement = Arrangement.SpaceBetween,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        )
+//        {
+//            Column(
+//                verticalArrangement = Arrangement.Top,
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ) {
+//                Text(
+//                    text = stringResource(R.string.edit_player),
+//                    color = Color.White,
+//                    fontSize = 30.sp,
+//                    textAlign = TextAlign.Center,
+//                    modifier = Modifier
+//                        .padding(top = 40.dp, start = 50.dp, end = 50.dp)
+//                        .fillMaxWidth()
+//                )
+//                Spacer(modifier = Modifier.height(40.dp))
+//                OutlinedTextField(
+//                    value = name,
+//                    onValueChange = { name = it },
+//                    label = { Text(text = stringResource(id = R.string.player_name)) },
+//                    modifier = Modifier
+//                        .width(300.dp)
+//                        .height(60.dp),
+//                    shape = RoundedCornerShape(15.dp)
+//                )
+//                Spacer(modifier = Modifier.height(10.dp))
+//                OutlinedTextField(
+//                    value = position,
+//                    onValueChange = { position = it },
+//                    label = { Text(text = stringResource(id = R.string.position)) },
+//                    modifier = Modifier
+//                        .width(300.dp)
+//                        .height(60.dp),
+//                    shape = RoundedCornerShape(15.dp)
+//                )
+//                Spacer(modifier = Modifier.height(10.dp))
+//                OutlinedTextField(
+//                    value = age,
+//                    onValueChange = { age = it },
+//                    label = { Text(text = stringResource(id = R.string.age)) },
+//                    modifier = Modifier
+//                        .width(300.dp)
+//                        .height(60.dp),
+//                    shape = RoundedCornerShape(15.dp)
+//                )
+//                Spacer(modifier = Modifier.height(10.dp))
+//                OutlinedTextField(
+//                    value = matchesPlayed,
+//                    onValueChange = { matchesPlayed = it },
+//                    label = { Text(text = stringResource(id = R.string.matches)) },
+//                    modifier = Modifier
+//                        .width(300.dp)
+//                        .height(60.dp),
+//                    shape = RoundedCornerShape(15.dp)
+//                )
+//                Spacer(modifier = Modifier.height(10.dp))
+//                OutlinedTextField(
+//                    value = goals,
+//                    onValueChange = { goals = it },
+//                    label = { Text(text = stringResource(id = R.string.goals)) },
+//                    modifier = Modifier
+//                        .width(300.dp)
+//                        .height(60.dp),
+//                    shape = RoundedCornerShape(15.dp)
+//                )
+//                Spacer(modifier = Modifier.height(10.dp))
+//                OutlinedTextField(
+//                    value = trainings,
+//                    onValueChange = { trainings = it },
+//                    label = { Text(text = stringResource(id = R.string.trainings)) },
+//                    modifier = Modifier
+//                        .width(300.dp)
+//                        .height(60.dp),
+//                    shape = RoundedCornerShape(15.dp)
+//                )
+//                Spacer(modifier = Modifier.height(40.dp))
+//                Button(
+//                    onClick = { /*TODO*/ },
+//                    modifier = Modifier
+//                        .width(125.dp)
+//                        .height(50.dp),
+//                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+//                    shape = RoundedCornerShape(15.dp)
+//                ) {
+//                    Text(
+//                        text = stringResource(R.string.edit),
+//                        color = Color.Black,
+//                        fontSize = 20.sp
+//                    )
+//                }
+//            }
+//            FooterPlayers()
+//        }
+//    }
+//}
+//
+//@Composable
+//fun AddNewPlayer(modifier: Modifier = Modifier) {
+//    var name by remember { mutableStateOf("") }
+//    var position by remember { mutableStateOf("") }
+//    var age by remember { mutableStateOf("") }
+//    var matchesPlayed by remember { mutableStateOf("") }
+//    var goals by remember { mutableStateOf("") }
+//    var trainings by remember { mutableStateOf("") }
+//    Box(
+//        modifier = modifier
+//            .background(color = DarkBlue)
+//    ) {
+//        IconButton(
+//            onClick = { /*TODO*/ },
+//            modifier = Modifier
+//                .size(60.dp)
+//                .padding(top = 40.dp, start = 10.dp)
+//                .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
+//        ) {
+//            Icon(
+//                imageVector = Icons.Filled.ArrowBack,
+//                contentDescription = null,
+//                tint = Color.Black,
+//                modifier = Modifier
+//            )
+//        }
+//        Column(
+//            modifier = modifier.fillMaxSize(),
+//            verticalArrangement = Arrangement.SpaceBetween,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        )
+//        {
+//            Column(
+//                verticalArrangement = Arrangement.Top,
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ) {
+//                Text(
+//                    text = stringResource(R.string.add_new_player),
+//                    color = Color.White,
+//                    fontSize = 30.sp,
+//                    textAlign = TextAlign.Center,
+//                    modifier = Modifier
+//                        .padding(top = 40.dp, start = 50.dp, end = 50.dp)
+//                        .fillMaxWidth()
+//                )
+//                Spacer(modifier = Modifier.height(40.dp))
+//                OutlinedTextField(
+//                    value = name,
+//                    onValueChange = { name = it },
+//                    label = { Text(text = stringResource(id = R.string.player_name)) },
+//                    modifier = Modifier
+//                        .width(300.dp)
+//                        .height(60.dp),
+//                    shape = RoundedCornerShape(15.dp)
+//                )
+//                Spacer(modifier = Modifier.height(10.dp))
+//                OutlinedTextField(
+//                    value = position,
+//                    onValueChange = { position = it },
+//                    label = { Text(text = stringResource(id = R.string.position)) },
+//                    modifier = Modifier
+//                        .width(300.dp)
+//                        .height(60.dp),
+//                    shape = RoundedCornerShape(15.dp)
+//                )
+//                Spacer(modifier = Modifier.height(10.dp))
+//                OutlinedTextField(
+//                    value = age,
+//                    onValueChange = { age = it },
+//                    label = { Text(text = stringResource(id = R.string.age)) },
+//                    modifier = Modifier
+//                        .width(300.dp)
+//                        .height(60.dp),
+//                    shape = RoundedCornerShape(15.dp)
+//                )
+//                Spacer(modifier = Modifier.height(10.dp))
+//                OutlinedTextField(
+//                    value = matchesPlayed,
+//                    onValueChange = { matchesPlayed = it },
+//                    label = { Text(text = stringResource(id = R.string.matches)) },
+//                    modifier = Modifier
+//                        .width(300.dp)
+//                        .height(60.dp),
+//                    shape = RoundedCornerShape(15.dp)
+//                )
+//                Spacer(modifier = Modifier.height(10.dp))
+//                OutlinedTextField(
+//                    value = goals,
+//                    onValueChange = { goals = it },
+//                    label = { Text(text = stringResource(id = R.string.goals)) },
+//                    modifier = Modifier
+//                        .width(300.dp)
+//                        .height(60.dp),
+//                    shape = RoundedCornerShape(15.dp)
+//                )
+//                Spacer(modifier = Modifier.height(10.dp))
+//                OutlinedTextField(
+//                    value = trainings,
+//                    onValueChange = { trainings = it },
+//                    label = { Text(text = stringResource(id = R.string.trainings)) },
+//                    modifier = Modifier
+//                        .width(300.dp)
+//                        .height(60.dp),
+//                    shape = RoundedCornerShape(15.dp)
+//                )
+//                Spacer(modifier = Modifier.height(40.dp))
+//                Button(
+//                    onClick = { /*TODO*/ },
+//                    modifier = Modifier
+//                        .width(125.dp)
+//                        .height(50.dp),
+//                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+//                    shape = RoundedCornerShape(15.dp)
+//                ) {
+//                    Text(
+//                        text = stringResource(R.string.add),
+//                        color = Color.Black,
+//                        fontSize = 20.sp
+//                    )
+//                }
+//            }
+//            FooterPlayers()
+//        }
+//    }
+//}

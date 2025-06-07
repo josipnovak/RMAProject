@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1001949090520",
+    "project_id": "rmaproject-bb77e",
+    "storage_bucket": "rmaproject-bb77e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1001949090520:android:936aedafc23907616f7dad",
+        "android_client_info": {
+          "package_name": "hr.ferit.josipnovak.projectrma"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjTdMzeDHK-iD9oEiZj8MF6WZDdOc3BHI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

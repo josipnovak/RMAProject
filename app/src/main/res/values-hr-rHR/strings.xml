@@ -18,4 +18,25 @@
     <string name="search">Pretraži</string>
     <string name="players">Igrači</string>
     <string name="account_details">Detalji računa</string>
+    <string name="event_details">Detalji događaja</string>
+    <string name="add_new_event">Dodaj novi događaj</string>
+    <string name="event_name">Naziv događaja</string>
+    <string name="event_time">Vrijeme događaja</string>
+    <string name="event_date">Datum događaja</string>
+    <string name="event_location">Lokacija događaja</string>
+    <string name="pick_time">Odaberi vrijeme</string>
+    <string name="pick_date">Odaberi datum</string>
+    <string name="add">Dodaj</string>
+    <string name="edit">Uredi</string>
+    <string name="delete">Izbriši</string>
+    <string name="player_details">Detalji igrača</string>
+    <string name="edit_player">Uredi igrača</string>
+    <string name="add_new_player">Dodaj novog igrača</string>
+    <string name="player_name">Ime igrača</string>
+    <string name="age">Godine</string>
+    <string name="position">Pozicija</string>
+    <string name="matches">Utakmice</string>
+    <string name="goals">Golovi</string>
+    <string name="trainings">Treninzi</string>
+
 </resources>

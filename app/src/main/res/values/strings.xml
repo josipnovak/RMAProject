@@ -17,4 +17,24 @@
     <string name="search">Search</string>
     <string name="players">Players</string>
     <string name="account_details">Account details</string>
+    <string name="event_details">Event details</string>
+    <string name="add_new_event">Add new event</string>
+    <string name="event_name">Event name</string>
+    <string name="event_time">Event time</string>
+    <string name="event_date">Event date</string>
+    <string name="event_location">Event location</string>
+    <string name="pick_time">Pick time</string>
+    <string name="pick_date">Pick date</string>
+    <string name="add">Add</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="player_details">Player details</string>
+    <string name="edit_player">Edit player</string>
+    <string name="add_new_player">Add new player</string>
+    <string name="player_name">Player name</string>
+    <string name="age">Age</string>
+    <string name="position">Position</string>
+    <string name="matches">Matches</string>
+    <string name="goals">Goals</string>
+    <string name="trainings">Trainings</string>
 </resources>
