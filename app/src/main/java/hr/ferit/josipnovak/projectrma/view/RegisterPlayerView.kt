@@ -1,6 +1,7 @@
 package hr.ferit.josipnovak.projectrma.view
 
 import android.util.Log
+import android.widget.VideoView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -19,12 +21,15 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,136 +47,116 @@ import androidx.navigation.NavController
 import hr.ferit.josipnovak.projectrma.FirebaseAuth
 import hr.ferit.josipnovak.projectrma.R
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
+import hr.ferit.josipnovak.projectrma.viewmodel.AuthViewModel
 
 @Composable
-fun RegisterPlayerView(modifier: Modifier = Modifier, navController: NavController, fbAuth: FirebaseAuth) {
+fun RegisterPlayerView(modifier: Modifier = Modifier, navController: NavController, authViewModel: AuthViewModel) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var password1 by remember { mutableStateOf("") }
     var password1Visible by remember { mutableStateOf(false) }
-    var teamCode by remember { mutableStateOf("") }
+    var clubCode by remember { mutableStateOf("") }
+    var position by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
 
+    val message by authViewModel.message.collectAsState()
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(DarkBlue)
-    ){
-        Column(
+    ) {
+        LazyColumn(
             modifier = modifier
                 .fillMaxSize()
                 .padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                OutlinedButton(
-                    onClick = { navController.navigate("register_coach") },
-                    modifier = Modifier
-                        .width(135.dp)
-                        .height(45.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = DarkBlue),
-                    shape = RoundedCornerShape(15.dp)
+            item {
+                Row(
+                    modifier = modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Text(text = stringResource(id = R.string.coach), color = Color.White, fontSize = 20.sp)
-                }
+                    OutlinedButton(
+                        onClick = { navController.navigate("register_coach") },
+                        modifier = Modifier
+                            .width(135.dp)
+                            .height(45.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = DarkBlue),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Text(text = stringResource(id = R.string.coach), color = Color.White, fontSize = 20.sp)
+                    }
 
-                Spacer(modifier = Modifier.width(30.dp))
+                    Spacer(modifier = Modifier.width(30.dp))
 
-                Button(
-                    onClick = { /*Do nothing*/  },
-                    modifier = Modifier
-                        .width(135.dp)
-                        .height(45.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                    shape = RoundedCornerShape(15.dp)
-                ) {
-                    Text(text = stringResource(id = R.string.player), color = Color.Black, fontSize = 20.sp)
+                    Button(
+                        onClick = { /*Do nothing*/ },
+                        modifier = Modifier
+                            .width(135.dp)
+                            .height(45.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Text(text = stringResource(id = R.string.player), color = Color.Black, fontSize = 20.sp)
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(30.dp))
+            item { Spacer(modifier = Modifier.height(30.dp)) }
 
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text(text = stringResource(id = R.string.name)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp),
-                shape = RoundedCornerShape(15.dp)
-            )
+            item {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text(text = stringResource(id = R.string.name)) },
+                    modifier = Modifier
+                        .width(300.dp)
+                        .height(60.dp),
+                    shape = RoundedCornerShape(15.dp)
+                )
+            }
 
-            Spacer(modifier = Modifier.height(30.dp))
+            item { Spacer(modifier = Modifier.height(30.dp)) }
 
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text(text = stringResource(id = R.string.email)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp),
-                shape = RoundedCornerShape(15.dp)
-            )
+            item {
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text(text = stringResource(id = R.string.email)) },
+                    modifier = Modifier
+                        .width(300.dp)
+                        .height(60.dp),
+                    shape = RoundedCornerShape(15.dp)
+                )
+            }
 
-            Spacer(modifier = Modifier.height(30.dp))
+            item { Spacer(modifier = Modifier.height(30.dp)) }
 
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text(text = stringResource(id = R.string.password)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp)
-                    .background(color = DarkBlue),
-                shape = RoundedCornerShape(15.dp),
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
-                    val image = if (passwordVisible) {
-                        Icons.Filled.Visibility
-                    } else {
-                        Icons.Filled.VisibilityOff
-                    }
-                    val description = if (passwordVisible) "Hide password" else "Show password"
-                    IconButton(
-                        onClick = { passwordVisible = !passwordVisible },
-                    ) {
-                        Icon(
-                            imageVector = image,
-                            contentDescription = description,
-                            tint = Color.White
-                        )
-                    }
-                }
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            OutlinedTextField(
-                value = password1,
-                onValueChange = { password1 = it },
-                label = { Text(text = stringResource(id = R.string.confirm_password)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp)
-                    .background(color = DarkBlue),
-                shape = RoundedCornerShape(15.dp),
-                visualTransformation =
-                    if (password1Visible) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon =
-                    {
-                        val image =
-                            if (password1Visible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                        val description =
-                            if (password1Visible) "Hide password" else "Show password"
+            item {
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text(text = stringResource(id = R.string.password)) },
+                    modifier = Modifier
+                        .width(300.dp)
+                        .height(60.dp)
+                        .background(color = DarkBlue),
+                    shape = RoundedCornerShape(15.dp),
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        val image = if (passwordVisible) {
+                            Icons.Filled.Visibility
+                        } else {
+                            Icons.Filled.VisibilityOff
+                        }
+                        val description = if (passwordVisible) "Hide password" else "Show password"
                         IconButton(
-                            onClick = { password1Visible = !password1Visible },
+                            onClick = { passwordVisible = !passwordVisible },
                         ) {
                             Icon(
                                 imageVector = image,
@@ -180,43 +165,124 @@ fun RegisterPlayerView(modifier: Modifier = Modifier, navController: NavControll
                             )
                         }
                     }
-            )
+                )
+            }
 
-            Spacer(modifier = Modifier.height(30.dp))
+            item { Spacer(modifier = Modifier.height(30.dp)) }
 
-            OutlinedTextField(
-                value = teamCode,
-                onValueChange = { teamCode = it },
-                label = { Text(text = stringResource(id = R.string.team_code)) },
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp),
-                shape = RoundedCornerShape(15.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-            )
+            item {
+                OutlinedTextField(
+                    value = password1,
+                    onValueChange = { password1 = it },
+                    label = { Text(text = stringResource(id = R.string.confirm_password)) },
+                    modifier = Modifier
+                        .width(300.dp)
+                        .height(60.dp)
+                        .background(color = DarkBlue),
+                    shape = RoundedCornerShape(15.dp),
+                    visualTransformation =
+                        if (password1Visible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon =
+                        {
+                            val image =
+                                if (password1Visible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                            val description =
+                                if (password1Visible) "Hide password" else "Show password"
+                            IconButton(
+                                onClick = { password1Visible = !password1Visible },
+                            ) {
+                                Icon(
+                                    imageVector = image,
+                                    contentDescription = description,
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                )
+            }
 
-            Spacer(modifier = Modifier.height(100.dp))
+            item { Spacer(modifier = Modifier.height(30.dp)) }
 
-            Button(
-                onClick = {
-                    fbAuth.registerUser(email, password) { success, error ->
-                        if (success) {
-                            navController.navigate("login")
-                        } else {
-                            Log.e("RegisterError", error ?: "Unknown error")
+            item {
+                OutlinedTextField(
+                    value = clubCode,
+                    onValueChange = { clubCode = it },
+                    label = { Text(text = stringResource(id = R.string.team_code)) },
+                    modifier = Modifier
+                        .width(300.dp)
+                        .height(60.dp),
+                    shape = RoundedCornerShape(15.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+            }
+
+            item { Spacer(modifier = Modifier.height(50.dp)) }
+
+            item {
+                Box {
+                    Button(
+                        onClick = { expanded = true },
+                        modifier = Modifier
+                            .width(300.dp)
+                            .height(60.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Text(
+                            text = if (position.isNotEmpty()) position else "Select position",
+                            color = Color.Black,
+                            fontSize = 16.sp
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        listOf("Goalkeeper", "Defender", "Midfielder", "Attacker").forEach { role ->
+                            DropdownMenuItem(
+                                text = { Text(text = role) },
+                                onClick = {
+                                    position = role
+                                    expanded = false
+                                }
+                            )
                         }
                     }
-                },
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(75.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                shape = RoundedCornerShape(15.dp)
-            ) {
+                }
+            }
+
+            item { Spacer(modifier = Modifier.height(50.dp)) }
+
+            item {
+                Button(
+                    onClick = {
+                        authViewModel.register(name, email, password, password1, "", "player", clubCode, position) {
+                            navController.navigate("start")
+                        }
+                    },
+                    modifier = Modifier
+                        .width(200.dp)
+                        .height(75.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(15.dp)
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.register),
+                        color = Color.Black,
+                        fontSize = 20.sp
+                    )
+                }
+            }
+
+            item { Spacer(modifier = Modifier.height(20.dp)) }
+
+            item {
                 Text(
-                    text = stringResource(id = R.string.register),
-                    color = Color.Black,
-                    fontSize = 20.sp
+                    text = message,
+                    color = Color.Red,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(top = 10.dp)
                 )
             }
         }

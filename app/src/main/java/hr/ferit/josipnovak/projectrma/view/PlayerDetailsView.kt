@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,22 +29,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import hr.ferit.josipnovak.projectrma.FirebaseAuth
-import hr.ferit.josipnovak.projectrma.ui.FooterUser
 import hr.ferit.josipnovak.projectrma.R
+import hr.ferit.josipnovak.projectrma.ui.FooterPlayers
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
 
 @Composable
-fun AccountDetailsView(modifier: Modifier = Modifier, navController: NavController, fbAuth: FirebaseAuth) {
+fun PlayerDetailsView(modifier: Modifier = Modifier, navController: NavController) {
     Box(
         modifier = modifier
             .background(color = DarkBlue)
     ) {
         IconButton(
-            onClick = { navController.navigateUp() },
+            onClick = { /*TODO*/ },
             modifier = Modifier
                 .size(60.dp)
-                .padding(top = 40.dp, start = 20.dp)
+                .padding(top = 40.dp, start = 10.dp)
                 .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
         ) {
             Icon(
@@ -64,13 +64,13 @@ fun AccountDetailsView(modifier: Modifier = Modifier, navController: NavControll
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(R.string.account_details),
+                    text = stringResource(R.string.player_details),
                     color = Color.White,
                     fontSize = 30.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .padding(top = 40.dp, start = 50.dp, end = 50.dp)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(40.dp))
                 Text(
@@ -79,40 +79,70 @@ fun AccountDetailsView(modifier: Modifier = Modifier, navController: NavControll
                     fontSize = 30.sp,
                     modifier = Modifier.padding(top = 40.dp)
                 )
-                Spacer(modifier = Modifier.height(20.dp))
                 Text(
-                    text = "Club name",
+                    text = "Position",
                     color = Color.White,
                     fontSize = 30.sp,
                     modifier = Modifier.padding(top = 40.dp)
                 )
-                Spacer(modifier = Modifier.height(20.dp))
                 Text(
-                    text = "Coach/Player",
+                    text = "Age",
                     color = Color.White,
                     fontSize = 30.sp,
                     modifier = Modifier.padding(top = 40.dp)
                 )
-                Spacer(modifier = Modifier.height(30.dp))
-                Button(
-                    onClick = {
-                        fbAuth.logoutUser()
-                        navController.navigate("start")
-                    },
-                    modifier = Modifier
-                        .width(125.dp)
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                    shape = RoundedCornerShape(15.dp)
-                ) {
-                    Text(
-                        text = "Logout",
-                        color = Color.Black,
-                        fontSize = 20.sp
-                    )
+                Text(
+                    text = "Matches Played",
+                    color = Color.White,
+                    fontSize = 30.sp,
+                    modifier = Modifier.padding(top = 40.dp)
+                )
+                Text(
+                    text = "Goals",
+                    color = Color.White,
+                    fontSize = 30.sp,
+                    modifier = Modifier.padding(top = 40.dp)
+                )
+                Text(
+                    text = "Trainings",
+                    color = Color.White,
+                    fontSize = 30.sp,
+                    modifier = Modifier.padding(top = 40.dp)
+                )
+                Spacer(modifier = Modifier.height(40.dp))
+                Row() {
+                    Button(
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier
+                            .width(125.dp)
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.delete),
+                            color = Color.Black,
+                            fontSize = 20.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(20.dp))
+                    Button(
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier
+                            .width(125.dp)
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.edit),
+                            color = Color.Black,
+                            fontSize = 20.sp
+                        )
+                    }
                 }
             }
-            FooterUser(navController = navController)
+            FooterPlayers(navController = navController)
         }
     }
 }

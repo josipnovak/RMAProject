@@ -24,6 +24,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,9 +41,10 @@ import androidx.navigation.NavController
 import hr.ferit.josipnovak.projectrma.FirebaseAuth
 import hr.ferit.josipnovak.projectrma.R
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
+import hr.ferit.josipnovak.projectrma.viewmodel.AuthViewModel
 
 @Composable
-fun RegisterCoachView(modifier: Modifier = Modifier, navController: NavController, fbAuth: FirebaseAuth) {
+fun RegisterCoachView(modifier: Modifier = Modifier, navController: NavController, authViewModel: AuthViewModel) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -51,7 +53,7 @@ fun RegisterCoachView(modifier: Modifier = Modifier, navController: NavControlle
     var password1Visible by remember { mutableStateOf(false) }
     var teamName by remember { mutableStateOf("") }
 
-
+    val message by authViewModel.message.collectAsState()
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -193,17 +195,12 @@ fun RegisterCoachView(modifier: Modifier = Modifier, navController: NavControlle
                 shape = RoundedCornerShape(15.dp)
             )
 
-            Spacer(modifier = Modifier.height(100.dp))
+            Spacer(modifier = Modifier.height(50.dp))
 
             Button(
                 onClick = {
-                    Log.d("RegisterCoach", "Registering user with email: $email and password: $password")
-                    fbAuth.registerUser(email, password) { success, error ->
-                        if (success) {
-                            navController.navigate("login")
-                        } else {
-                            Log.e("RegisterError", error ?: "Unknown error")
-                        }
+                    authViewModel.register(name, email, password, password1, teamName, "coach", null, null) {
+                        navController.navigate("start")
                     }
                 },
                 modifier = Modifier
@@ -218,6 +215,14 @@ fun RegisterCoachView(modifier: Modifier = Modifier, navController: NavControlle
                     fontSize = 20.sp
                 )
             }
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = message,
+                color = Color.Red,
+                fontSize = 16.sp,
+                modifier = Modifier.padding(top = 10.dp)
+            )
         }
     }
 }

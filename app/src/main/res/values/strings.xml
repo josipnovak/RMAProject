@@ -37,4 +37,9 @@
     <string name="matches">Matches</string>
     <string name="goals">Goals</string>
     <string name="trainings">Trainings</string>
+    <string name="enter_values">Please enter all values</string>
+    <string name="error_message">Wrong email or password</string>
+    <string name="password_error">Passwords do not match</string>
+    <string name="internal_error">Error while saving</string>
+    <string name="club_not_found">Wrong club code</string>
 </resources>

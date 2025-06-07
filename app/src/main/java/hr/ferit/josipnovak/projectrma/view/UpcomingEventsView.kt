@@ -39,7 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import hr.ferit.josipnovak.projectrma.FooterEvent
+import hr.ferit.josipnovak.projectrma.ui.FooterEvent
 import hr.ferit.josipnovak.projectrma.R
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
 

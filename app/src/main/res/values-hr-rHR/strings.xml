@@ -38,5 +38,9 @@
     <string name="matches">Utakmice</string>
     <string name="goals">Golovi</string>
     <string name="trainings">Treninzi</string>
-
+    <string name="enter_values">Unesite sve podatke</string>
+    <string name="error_message">Netočan email ili lozinka</string>
+    <string name="password_error">Lozinke se ne podudaraju</string>
+    <string name="internal_error">Greška prilikom spremanja</string>
+    <string name="club_not_found">Pogrešan kod kluba</string>
 </resources>
