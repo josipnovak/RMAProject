@@ -6,11 +6,12 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import hr.ferit.josipnovak.projectrma.FirebaseAuth
+import hr.ferit.josipnovak.projectrma.model.Club
 import hr.ferit.josipnovak.projectrma.model.User
 import kotlinx.coroutines.tasks.await
 
 class PlayersViewModel(
-    private val auth: FirebaseAuth,
+    private val fbAuth: FirebaseAuth,
     private val db: FirebaseFirestore,
 ) : ViewModel() {
 
@@ -18,7 +19,7 @@ class PlayersViewModel(
         onSuccess: (String, String, String) -> Unit,
         onError: (String) -> Unit
     ) {
-        val currentUser = auth.getCurrentUser()
+        val currentUser = fbAuth.getCurrentUser()
         if (currentUser != null) {
             val email = currentUser.email
             if (email != null) {
@@ -90,6 +91,39 @@ class PlayersViewModel(
             }
     }
 
+    fun getBestPlayers(
+        onSuccess: (List<User>) -> Unit
+    ){
+        getClubId { clubId ->
+            if (clubId != "No Club ID") {
+                db.collection("clubs").document(clubId)
+                    .get()
+                    .addOnSuccessListener { document ->
+                        val playerIds = document.get("players") as? List<String> ?: emptyList()
+                        val tasks = playerIds.map { playerId ->
+                            db.collection("users").document(playerId).get()
+                        }
+
+                        Tasks.whenAllSuccess<DocumentSnapshot>(tasks)
+                            .addOnSuccessListener { snapshots ->
+                                val players = snapshots.mapNotNull { snapshot ->
+                                    snapshot.toObject(User::class.java)?.copy(id = snapshot.id)
+                                }
+                                onSuccess(players.sortedByDescending { it.goals + it.assists }.take(3))
+                            }
+                            .addOnFailureListener { exception ->
+                                println("Error fetching best players: ${exception.message}")
+                            }
+                    }
+                    .addOnFailureListener { exception ->
+                        println("Error fetching club document: ${exception.message}")
+                    }
+            } else {
+                println("No Club ID found for the current user.")
+            }
+        }
+    }
+
     suspend fun getPlayerById(playerId: String): User {
         return try {
             val documents = db.collection("users")
@@ -135,5 +169,77 @@ class PlayersViewModel(
             .addOnFailureListener { e ->
                 println("Error updating player: ${e.message}")
             }
+    }
+
+    fun getUserAndClubData(callback: (User, Club) -> Unit) {
+        val currentUser = fbAuth.getCurrentUser()
+        if (currentUser != null) {
+            val email = currentUser.email
+            if (email != null) {
+                db.collection("users")
+                    .whereEqualTo("email", email)
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        if (!documents.isEmpty) {
+                            val user = documents.first()
+                            val clubId = user.getString("clubId") ?: "No Club ID"
+                            db.collection("clubs").document(clubId)
+                                .get()
+                                .addOnSuccessListener { clubDocument ->
+                                    val club = clubDocument.toObject(Club::class.java) ?: Club()
+                                    club.id = clubDocument.id
+                                    val userObj = user.toObject(User::class.java) ?: User()
+                                    userObj.id = user.id
+                                    callback(userObj, club)
+                                }
+                                .addOnFailureListener {
+                                    callback(User(), Club())
+                                }
+                            callback(User(), Club())
+                        } else {
+                            callback(User(), Club())
+                        }
+                    }
+                    .addOnFailureListener {
+                        callback(User(), Club())
+                    }
+            } else {
+                callback(User(), Club())
+            }
+        } else {
+            callback(User(), Club())
+        }
+    }
+
+    fun logout() {
+        fbAuth.logoutUser()
+    }
+
+    private fun getClubId(callback: (String) -> Unit) {
+        val currentUser = fbAuth.getCurrentUser()
+        if (currentUser != null) {
+            val email = currentUser.email
+            if (email != null) {
+                db.collection("users")
+                    .whereEqualTo("email", email)
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        if (!documents.isEmpty) {
+                            val user = documents.first()
+                            val clubId = user.getString("clubId") ?: "No Club ID"
+                            callback(clubId)
+                        } else {
+                            callback("No Club ID")
+                        }
+                    }
+                    .addOnFailureListener {
+                        callback("No Club ID")
+                    }
+            } else {
+                callback("No Club ID")
+            }
+        } else {
+            callback("No Club ID")
+        }
     }
 }

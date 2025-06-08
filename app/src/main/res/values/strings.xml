@@ -47,4 +47,5 @@
     <string name="midfielder">Midfielder</string>
     <string name="attacker">Attacker</string>
     <string name="location_name">Location name</string>
+    <string name="statistic">Statistic</string>
 </resources>

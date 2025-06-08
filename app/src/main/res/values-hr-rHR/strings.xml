@@ -48,4 +48,5 @@
     <string name="midfielder">Vezni igrač</string>
     <string name="attacker">Napadač</string>
     <string name="location_name">Naziv lokacije</string>
+    <string name="statistic">Statistika</string>
 </resources>

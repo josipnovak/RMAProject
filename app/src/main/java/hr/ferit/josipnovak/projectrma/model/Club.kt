@@ -1,7 +1,7 @@
 package hr.ferit.josipnovak.projectrma.model
 
 data class Club(
-    val id: String = "",
+    var id: String = "",
     val name: String = "",
     val coachId: String = "",
     val players: List<String> = emptyList(),

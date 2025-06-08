@@ -157,8 +157,4 @@ class AuthViewModel(
             }
         }
     }
-
-    fun logout() {
-        auth.logoutUser()
-    }
 }

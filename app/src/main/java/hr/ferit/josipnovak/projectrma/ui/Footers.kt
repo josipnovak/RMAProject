@@ -29,7 +29,7 @@ fun FooterHome(modifier: Modifier = Modifier, navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(0.dp),
+            .padding(horizontal = 16.dp, vertical = 0.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -65,7 +65,7 @@ fun FooterEvent(modifier: Modifier = Modifier, navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(0.dp),
+            .padding(horizontal = 16.dp, vertical = 0.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -101,7 +101,7 @@ fun FooterPlayers(modifier: Modifier = Modifier, navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(0.dp),
+            .padding(horizontal = 16.dp, vertical = 0.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -137,7 +137,7 @@ fun FooterUser(modifier: Modifier = Modifier, navController: NavController) {
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
-            .padding(0.dp),
+            .padding(horizontal = 16.dp, vertical = 0.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

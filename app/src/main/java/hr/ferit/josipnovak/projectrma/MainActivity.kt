@@ -124,10 +124,10 @@ class MainActivity : ComponentActivity() {
                         composable("login") { LoginScreenView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, authViewModel = authViewModel) }
                         composable("register_coach") { RegisterCoachView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, authViewModel = authViewModel) }
                         composable("register_player") { RegisterPlayerView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, authViewModel = authViewModel) }
-                        composable("main") { MainScreenView(modifier = Modifier.padding(bottom = 25.dp), navController = navController) }
+                        composable("main") { MainScreenView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, playersViewModel = playersViewModel, eventsViewModel = eventsViewModel) }
                         composable("upcoming_events") { UpcomingEventsView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, eventsViewModel = eventsViewModel) }
                         composable("players") { PlayersView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, playersViewModel = playersViewModel) }
-                        composable("account_details") { AccountDetailsView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, authViewModel = authViewModel) }
+                        composable("account_details") { AccountDetailsView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, playersViewModel = playersViewModel) }
                         composable("player/{playerId}") { backStackEntry ->
                             val playerId = backStackEntry.arguments?.getString("playerId")
                             if (playerId != null) {

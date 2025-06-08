@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -106,122 +107,115 @@ fun PlayersView(modifier: Modifier = Modifier, navController: NavController, pla
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = stringResource(R.string.players),
-                color = Color.White,
-                fontSize = 30.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(top = 40.dp, start = 50.dp, end = 50.dp)
-                    .fillMaxWidth(),
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            Row(
-                modifier = Modifier
-                    .width(350.dp)
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                TextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    label = { Text(text = stringResource(id = R.string.search)) },
+            if(role == "coach") {
+                Text(
+                    text = stringResource(R.string.players),
+                    color = Color.White,
+                    fontSize = 30.sp,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .width(225.dp)
-                        .height(60.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color.Black,
-                        unfocusedIndicatorColor = Color.Black,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        cursorColor = Color.Black,
-                        focusedLabelColor = Color.Black,
-                        unfocusedLabelColor = Color.Black,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black
-                    ),
-                    shape = RoundedCornerShape(15.dp),
-                    trailingIcon = {
-                        IconButton(
-                            onClick = { /*TODO*/ },
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Search,
-                                contentDescription = null,
-                                tint = Color.Black
-                            )
-                        }
-                    }
+                        .padding(top = 40.dp, start = 50.dp, end = 50.dp)
+                        .fillMaxWidth(),
                 )
 
-                IconButton(
-                    onClick = { navController.navigate("add_new_player") },
+                Spacer(modifier = Modifier.height(40.dp))
+
+                Row(
                     modifier = Modifier
-                        .size(60.dp)
-                        .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
+                        .width(350.dp)
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = null,
-                        tint = Color.Black,
+                    IconButton(
+                        onClick = { /*TODO*/ },
                         modifier = Modifier
-                    )
-                }
-            }
-
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            LazyColumn(
-                modifier = Modifier
-                    .width(350.dp)
-                    .weight(1f)
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                players.forEach { (position, playerList) ->
-                    item {
-                        Text(
-                            text = position,
-                            fontSize = 24.sp,
-                            color = Color.White,
-                            modifier = Modifier.padding(vertical = 8.dp)
+                            .size(40.dp)
+                            .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.FilterAlt,
+                            contentDescription = null,
+                            tint = Color.Black,
+                            modifier = Modifier
                         )
                     }
-                    items(playerList.size) { index ->
-                        Card(
-                            shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(containerColor = LightBlue),
+                    Spacer(modifier = Modifier.width(15.dp))
+
+                    IconButton(
+                        onClick = { navController.navigate("add_new_player") },
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = null,
+                            tint = Color.Black,
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .height(80.dp)
-                                .padding(vertical = 8.dp),
-                            onClick = { navController.navigate("player/${playerList[index].id}") }
-                        ) {
-                            Column(
-                                modifier = Modifier.fillMaxSize(),
-                                verticalArrangement = Arrangement.Top
+                        )
+                    }
+                }
+
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                LazyColumn(
+                    modifier = Modifier
+                        .width(350.dp)
+                        .weight(1f)
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    players.forEach { (position, playerList) ->
+                        item {
+                            Text(
+                                text = position,
+                                fontSize = 24.sp,
+                                color = Color.White,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        }
+                        items(playerList.size) { index ->
+                            Card(
+                                shape = RoundedCornerShape(12.dp),
+                                colors = CardDefaults.cardColors(containerColor = LightBlue),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(80.dp)
+                                    .padding(vertical = 8.dp),
+                                onClick = { navController.navigate("player/${playerList[index].id}") }
                             ) {
-                                Text(
-                                    text = playerList[index].name,
-                                    fontSize = 18.sp,
-                                    color = Color.White,
-                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                                )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "Matches: ${playerList[index].matches}",
-                                    fontSize = 14.sp,
-                                    color = Color.White,
-                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                                )
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.Top
+                                ) {
+                                    Text(
+                                        text = playerList[index].name,
+                                        fontSize = 18.sp,
+                                        color = Color.White,
+                                        modifier = Modifier.padding(
+                                            horizontal = 16.dp,
+                                            vertical = 4.dp
+                                        )
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = "Matches: ${playerList[index].matches}",
+                                        fontSize = 14.sp,
+                                        color = Color.White,
+                                        modifier = Modifier.padding(
+                                            horizontal = 16.dp,
+                                            vertical = 4.dp
+                                        )
+                                    )
+                                }
                             }
                         }
                     }
                 }
+            }else{
+                /* TODO */
             }
             FooterPlayers(navController = navController)
         }

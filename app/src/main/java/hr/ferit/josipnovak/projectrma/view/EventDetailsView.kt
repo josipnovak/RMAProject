@@ -46,11 +46,15 @@ import hr.ferit.josipnovak.projectrma.viewmodel.EventsViewModel
 @Composable
 fun EventDetailsView(modifier: Modifier = Modifier, navController: NavController, eventsViewModel: EventsViewModel, eventId: String) {
     var event by remember { mutableStateOf<Event?>(null) }
+    var isCoach by remember { mutableStateOf(false) }
     LaunchedEffect(eventId) {
         try {
             event = eventsViewModel.getEventById(eventId)
         } catch (e: Exception) {
             event = null
+        }
+        eventsViewModel.isCoach { coachStatus ->
+            isCoach = coachStatus
         }
     }
     Box(
@@ -94,60 +98,62 @@ fun EventDetailsView(modifier: Modifier = Modifier, navController: NavController
                 Text(
                     text = "${event?.type}: ${event?.name}",
                     color = Color.White,
-                    fontSize = 30.sp,
+                    fontSize = 16.sp,
                     modifier = Modifier.padding(top = 40.dp)
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
                     text = "${event?.time}",
                     color = Color.White,
-                    fontSize = 30.sp,
+                    fontSize = 16.sp,
                     modifier = Modifier.padding(top = 40.dp)
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
                     text = "${event?.date}",
                     color = Color.White,
-                    fontSize = 30.sp,
+                    fontSize = 16.sp,
                     modifier = Modifier.padding(top = 40.dp)
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
                     text = "${event?.location?.name}",
                     color = Color.White,
-                    fontSize = 30.sp,
+                    fontSize = 16.sp,
                     modifier = Modifier.padding(top = 40.dp)
                 )
-                Spacer(modifier = Modifier.height(40.dp))
-                Row() {
-                    Button(
-                        onClick = { /*TODO*/ },
-                        modifier = Modifier
-                            .width(125.dp)
-                            .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                        shape = RoundedCornerShape(15.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.delete),
-                            color = Color.Black,
-                            fontSize = 20.sp
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(20.dp))
-                    Button(
-                        onClick = { navController.navigate("edit_event/${event?.id}") },
-                        modifier = Modifier
-                            .width(125.dp)
-                            .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                        shape = RoundedCornerShape(15.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.edit),
-                            color = Color.Black,
-                            fontSize = 20.sp
-                        )
+                if(isCoach) {
+                    Spacer(modifier = Modifier.height(40.dp))
+                    Row() {
+                        Button(
+                            onClick = { /*TODO*/ },
+                            modifier = Modifier
+                                .width(125.dp)
+                                .height(50.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                            shape = RoundedCornerShape(15.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.delete),
+                                color = Color.Black,
+                                fontSize = 20.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(20.dp))
+                        Button(
+                            onClick = { navController.navigate("edit_event/${event?.id}") },
+                            modifier = Modifier
+                                .width(125.dp)
+                                .height(50.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                            shape = RoundedCornerShape(15.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.edit),
+                                color = Color.Black,
+                                fontSize = 20.sp
+                            )
+                        }
                     }
                 }
             }

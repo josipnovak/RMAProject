@@ -52,10 +52,14 @@ import kotlin.math.roundToInt
 @Composable
 fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavController, eventsViewModel: EventsViewModel) {
     var events by remember { mutableStateOf<List<Event>>(emptyList()) }
+    var isCoach by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         eventsViewModel.getUpcomingEvents { fetchedEvents ->
             events = fetchedEvents
             Log.d("UpcomingEventsView", "Fetched events: $events")
+        }
+        eventsViewModel.isCoach { coachStatus ->
+            isCoach = coachStatus
         }
     }
     Box(
@@ -93,45 +97,46 @@ fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavControll
             )
 
             Spacer(modifier = Modifier.height(40.dp))
-
-            Row(
-                modifier = Modifier
-                    .width(350.dp)
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                IconButton(
-                    onClick = { /*TODO*/ },
+            if(isCoach) {
+                Row(
                     modifier = Modifier
-                        .size(40.dp)
-                        .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
+                        .width(350.dp)
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.FilterAlt,
-                        contentDescription = null,
-                        tint = Color.Black,
+                    IconButton(
+                        onClick = { /*TODO*/ },
                         modifier = Modifier
-                    )
-                }
-                Spacer(modifier = Modifier.width(15.dp))
-                IconButton(
-                    onClick = { navController.navigate("add_event") },
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = null,
-                        tint = Color.Black,
+                            .size(40.dp)
+                            .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.FilterAlt,
+                            contentDescription = null,
+                            tint = Color.Black,
+                            modifier = Modifier
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(15.dp))
+                    IconButton(
+                        onClick = { navController.navigate("add_event") },
                         modifier = Modifier
-                    )
+                            .size(40.dp)
+                            .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = null,
+                            tint = Color.Black,
+                            modifier = Modifier
+                        )
+                    }
+
                 }
 
+                Spacer(modifier = Modifier.height(20.dp))
             }
-
-            Spacer(modifier = Modifier.height(20.dp))
 
             LazyColumn(
                 modifier = Modifier

@@ -1,6 +1,8 @@
 package hr.ferit.josipnovak.projectrma.viewmodel
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -9,15 +11,17 @@ import hr.ferit.josipnovak.projectrma.model.Event
 import hr.ferit.josipnovak.projectrma.model.Location
 import hr.ferit.josipnovak.projectrma.model.User
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import kotlin.text.get
 import kotlin.text.set
 
 class EventsViewModel(
     private val fbAuth: FirebaseAuth,
     private val db: FirebaseFirestore,
-) : ViewModel(){
-    fun addNewEvent(event: Event){
-        getClubId {clubId ->
+) : ViewModel() {
+    fun addNewEvent(event: Event) {
+        getClubId { clubId ->
             if (clubId != "No Club ID") {
                 val newEventRef = db.collection("events").document()
                 event.id = newEventRef.id
@@ -43,8 +47,8 @@ class EventsViewModel(
     }
 
     fun getUpcomingEvents(
-        onSuccess : (List<Event>) -> Unit
-    ){
+        onSuccess: (List<Event>) -> Unit
+    ) {
         getClubId { clubId ->
             if (clubId != "No Club ID") {
                 db.collection("events")
@@ -52,7 +56,8 @@ class EventsViewModel(
                     .get()
                     .addOnSuccessListener { documents ->
                         val events = documents.map { document ->
-                            val locationMap = document.get("location") as? Map<String, Any> ?: emptyMap()
+                            val locationMap =
+                                document.get("location") as? Map<String, Any> ?: emptyMap()
                             val location = Location(
                                 name = locationMap["name"] as? String ?: "",
                                 latitude = (locationMap["latitude"] as? Number)?.toDouble() ?: 0.0,
@@ -80,11 +85,57 @@ class EventsViewModel(
         }
     }
 
-    suspend fun getEventById(eventId: String): Event{
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun getEventsForThisWeek(
+        onSuccess: (Map<String, Int>) -> Unit
+    ) {
+        getClubId { clubId ->
+            if (clubId != "No Club ID") {
+                db.collection("events")
+                    .whereEqualTo("clubId", clubId)
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+                        val today = LocalDate.now()
+                        val nextWeek = today.plusDays(7)
+
+                        val eventCounts = documents.mapNotNull { document ->
+                            val eventDate = document.getString("date")?.let {
+                                try {
+                                    LocalDate.parse(it, formatter)
+                                } catch (e: Exception) {
+                                    null
+                                }
+                            }
+                            if (eventDate != null && (eventDate.isEqual(today) || (eventDate.isAfter(
+                                    today
+                                ) && eventDate.isBefore(nextWeek)))
+                            ) {
+                                document.getString("type")
+                            } else {
+                                null
+                            }
+                        }.groupingBy { it }.eachCount()
+
+                        onSuccess(eventCounts)
+                        Log.d("EventsViewModel", "Event counts for this week: $eventCounts")
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("EventsViewModel", "Error fetching event counts: ${e.message}")
+                    }
+            } else {
+                Log.d("EventsViewModel", "No Club ID found for the current user.")
+            }
+        }
+    }
+
+
+    suspend fun getEventById(eventId: String): Event {
         return try {
             val document = db.collection("events").document(eventId).get().await()
             if (document.exists()) {
-                val locationMap = document.get("location") as? Map<String, Any> ?: emptyMap()
+                val locationMap =
+                    document.get("location") as? Map<String, Any> ?: emptyMap()
                 val location = Location(
                     name = locationMap["name"] as? String ?: "",
                     latitude = (locationMap["latitude"] as? Number)?.toDouble() ?: 0.0,
@@ -107,7 +158,7 @@ class EventsViewModel(
         }
     }
 
-    fun updatePlayer(event: Event){
+    fun updatePlayer(event: Event) {
         val eventRef = db.collection("events").document(event.id)
         eventRef.set(event)
             .addOnSuccessListener {
@@ -116,6 +167,27 @@ class EventsViewModel(
             .addOnFailureListener { e ->
                 println("Error updating event: ${e.message}")
             }
+    }
+
+    fun isCoach(callback: (Boolean) -> Unit) {
+        val currentUser = fbAuth.getCurrentUser()
+        if (currentUser != null) {
+            val email = currentUser.email
+            if (email != null) {
+                db.collection("users")
+                    .whereEqualTo("email", email)
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        if (!documents.isEmpty) {
+                            val user = documents.first()
+                            Log.d("EventsViewModel", "User document: ${user.getString("role")}")
+                            val role = user.getString("role") ?: "No Role"
+                            callback(role == "coach")
+                        }
+                    }
+            }
+        }
+        callback(false)
     }
 
     private fun getClubId(callback: (String) -> Unit) {
@@ -146,3 +218,4 @@ class EventsViewModel(
         }
     }
 }
+
