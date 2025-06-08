@@ -361,6 +361,7 @@ fun EditEventView(modifier: Modifier = Modifier, navController: NavController, e
                         )
                         val event = Event(
                             id = event?.id ?: "",
+                            clubId = event?.clubId ?: "",
                             type = eventType,
                             name = eventName,
                             date = eventDate,
@@ -368,7 +369,7 @@ fun EditEventView(modifier: Modifier = Modifier, navController: NavController, e
                             location = location
                         )
                         Log.d("AddNewEventView", "Editing event: $event")
-                        eventsViewModel.updatePlayer(event)
+                        eventsViewModel.updateEvent(event)
                         Log.d("AddNewEventView", "Event edited: $event")
                         navController.navigate("upcoming_events")
                     },

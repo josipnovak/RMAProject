@@ -1,5 +1,7 @@
 package hr.ferit.josipnovak.projectrma.viewmodel
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.DocumentSnapshot
@@ -8,12 +10,16 @@ import com.google.firebase.firestore.FirebaseFirestore
 import hr.ferit.josipnovak.projectrma.FirebaseAuth
 import hr.ferit.josipnovak.projectrma.model.Club
 import hr.ferit.josipnovak.projectrma.model.User
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.tasks.await
 
 class PlayersViewModel(
     private val fbAuth: FirebaseAuth,
     private val db: FirebaseFirestore,
 ) : ViewModel() {
+    private val _message = MutableStateFlow(" ")
+    val message: StateFlow<String> = _message
 
     fun getUserDetails(
         onSuccess: (String, String, String) -> Unit,
@@ -141,7 +147,11 @@ class PlayersViewModel(
         }
     }
 
-    fun addNewPlayer(player: User, clubId: String){
+    fun addNewPlayer(player: User, clubId: String, onSucces: () -> Unit) {
+        if(player.position == "" || player.name == "") {
+            _message.value = "Name and position cannot be empty"
+            return
+        }
         val newPlayerRef = db.collection("users").document()
         player.id = newPlayerRef.id
         newPlayerRef.set(player)
@@ -149,7 +159,7 @@ class PlayersViewModel(
                 db.collection("clubs").document(clubId)
                     .update("players", FieldValue.arrayUnion(player.id))
                     .addOnSuccessListener {
-                        println("Player added successfully")
+                        onSucces()
                     }
                     .addOnFailureListener { e ->
                         println("Error updating club with new player: ${e.message}")
@@ -209,6 +219,43 @@ class PlayersViewModel(
         } else {
             callback(User(), Club())
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun deletePlayer(
+        playerId: String,
+        onSuccess : () -> Unit,
+    ){
+        var clubId: String
+        db.collection("users")
+            .whereEqualTo("id", playerId)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (!documents.isEmpty) {
+                    val user = documents.first()
+                    clubId = user.getString("clubId") ?: "No Club ID"
+                    db.collection("clubs").document(clubId)
+                        .update("players", FieldValue.arrayRemove(playerId))
+                        .addOnSuccessListener {
+                            db.collection("users").document(playerId)
+                                .delete()
+                                .addOnSuccessListener {
+                                    onSuccess()
+                                }
+                                .addOnFailureListener { e ->
+                                    println("Error deleting player: ${e.message}")
+                                }
+                        }
+                        .addOnFailureListener { e ->
+                            println("Error updating club with removed player: ${e.message}")
+                        }
+                } else {
+                    println("Player not found")
+                }
+            }
+            .addOnFailureListener { e ->
+                println("Error fetching player: ${e.message}")
+            }
     }
 
     fun logout() {

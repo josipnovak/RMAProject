@@ -54,6 +54,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -122,6 +124,8 @@ fun AddNewEventView(modifier: Modifier = Modifier, navController: NavController,
 
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
+
+    val message by eventsViewModel.message.collectAsState()
 
     val datePickerDialog = DatePickerDialog(
         context,
@@ -337,7 +341,7 @@ fun AddNewEventView(modifier: Modifier = Modifier, navController: NavController,
                     }
                 }
 
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 Button(
                     onClick = {
@@ -353,10 +357,9 @@ fun AddNewEventView(modifier: Modifier = Modifier, navController: NavController,
                             time = eventTime,
                             location = location
                         )
-                        Log.d("AddNewEventView", "Adding event: $event")
-                        eventsViewModel.addNewEvent(event)
-                        Log.d("AddNewEventView", "Event added: $event")
-                        navController.navigate("upcoming_events")
+                        eventsViewModel.addNewEvent(event) {
+                            navController.navigate("upcoming_events")
+                        }
                     },
                     modifier = Modifier
                         .width(150.dp)
@@ -370,6 +373,16 @@ fun AddNewEventView(modifier: Modifier = Modifier, navController: NavController,
                         fontSize = 20.sp
                     )
                 }
+                Spacer(modifier = Modifier.height(20.dp))
+                Text(
+                    text = message,
+                    color = Color.Red,
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(horizontal = 20.dp)
+                        .fillMaxWidth()
+                )
             }
             FooterEvent(navController = navController)
         }

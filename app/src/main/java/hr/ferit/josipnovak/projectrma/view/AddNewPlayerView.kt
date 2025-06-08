@@ -26,6 +26,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,6 +58,8 @@ fun AddNewPlayerView(modifier: Modifier = Modifier, navController: NavController
     var trainings by remember { mutableStateOf("") }
 
     var clubId by remember { mutableStateOf("") }
+
+    val message by playersViewModel.message.collectAsState()
 
     LaunchedEffect(Unit){
         playersViewModel.getUserDetails(
@@ -206,8 +209,9 @@ fun AddNewPlayerView(modifier: Modifier = Modifier, navController: NavController
                             clubId = clubId,
                             role = "player",
                         )
-                        playersViewModel.addNewPlayer(user, clubId)
-                        navController.navigateUp()
+                        playersViewModel.addNewPlayer(user, clubId){
+                            navController.navigateUp()
+                        }
                     },
                     modifier = Modifier
                         .width(125.dp)
@@ -221,6 +225,13 @@ fun AddNewPlayerView(modifier: Modifier = Modifier, navController: NavController
                         fontSize = 20.sp
                     )
                 }
+                Text(
+                    text = message,
+                    color = Color.Red,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(top = 10.dp)
+                )
+
             }
             FooterPlayers(navController = navController)
         }

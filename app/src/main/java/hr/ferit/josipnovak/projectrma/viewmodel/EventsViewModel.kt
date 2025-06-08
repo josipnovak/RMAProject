@@ -1,9 +1,19 @@
 package hr.ferit.josipnovak.projectrma.viewmodel
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location.distanceBetween
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.annotation.RequiresPermission
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import hr.ferit.josipnovak.projectrma.FirebaseAuth
@@ -13,6 +23,8 @@ import hr.ferit.josipnovak.projectrma.model.User
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlin.text.get
 import kotlin.text.set
 
@@ -20,7 +32,18 @@ class EventsViewModel(
     private val fbAuth: FirebaseAuth,
     private val db: FirebaseFirestore,
 ) : ViewModel() {
-    fun addNewEvent(event: Event) {
+
+    private val _message = MutableStateFlow(" ")
+    val message: StateFlow<String> = _message
+
+    fun addNewEvent(
+        event: Event,
+        onSuccess: (Boolean) -> Unit
+    ) {
+        if( event.name.isEmpty() || event.date.isEmpty() || event.time.isEmpty()) {
+            _message.value = "Please fill in all fields."
+            return
+        }
         getClubId { clubId ->
             if (clubId != "No Club ID") {
                 val newEventRef = db.collection("events").document()
@@ -31,19 +54,55 @@ class EventsViewModel(
                         db.collection("clubs").document(clubId)
                             .update("events", FieldValue.arrayUnion(event.id))
                             .addOnSuccessListener {
-                                println("Event added successfully to the club.")
+                                onSuccess(true)
                             }
                             .addOnFailureListener { e ->
-                                println("Error updating club with new event: ${e.message}")
+                                _message.value = "Error updating club with new event: ${e.message}"
                             }
                     }
                     .addOnFailureListener { e ->
-                        println("Error adding new event: ${e.message}")
+                        _message.value = "Error adding new event: ${e.message}"
                     }
             } else {
                 Log.d("AAA", "No Club ID found for the current user.")
             }
         }
+    }
+
+    fun deleteEvent(
+        eventId: String,
+        onSuccess: () -> Unit
+    ){
+        var clubId: String
+        db.collection("events")
+            .whereEqualTo("id", eventId)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (!documents.isEmpty) {
+                    val user = documents.first()
+                    clubId = user.getString("clubId") ?: "No Club ID"
+                    db.collection("clubs").document(clubId)
+                        .update("events", FieldValue.arrayRemove(eventId))
+                        .addOnSuccessListener {
+                            db.collection("events").document(eventId)
+                                .delete()
+                                .addOnSuccessListener {
+                                    onSuccess()
+                                }
+                                .addOnFailureListener { e ->
+                                    println("Error deleting event: ${e.message}")
+                                }
+                        }
+                        .addOnFailureListener { e ->
+                            println("Error updating club with removed event: ${e.message}")
+                        }
+                } else {
+                    println("event not found")
+                }
+            }
+            .addOnFailureListener { e ->
+                println("Error fetching event: ${e.message}")
+            }
     }
 
     fun getUpcomingEvents(
@@ -158,7 +217,7 @@ class EventsViewModel(
         }
     }
 
-    fun updatePlayer(event: Event) {
+    fun updateEvent(event: Event) {
         val eventRef = db.collection("events").document(event.id)
         eventRef.set(event)
             .addOnSuccessListener {
@@ -217,5 +276,40 @@ class EventsViewModel(
             callback("No Club ID")
         }
     }
-}
 
+    fun calculateDistanceToLocation(
+        targetLocation: Location,
+        context: Context,
+        onResult: (Double?) -> Unit
+    ) {
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
+        if (
+            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.d("EventsViewModel", "Location permissions not granted")
+            onResult(null)
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnCompleteListener { task ->
+            if (task.isSuccessful && task.result != null) {
+                val currentLoc = task.result
+                val results = FloatArray(1)
+                distanceBetween(
+                    currentLoc.latitude,
+                    currentLoc.longitude,
+                    targetLocation.latitude,
+                    targetLocation.longitude,
+                    results
+                )
+                Log.d("EventsViewModel", "Distance to target location: ${results[0]} meters")
+                onResult(results[0].toDouble() / 1000)
+            } else {
+                Log.d("EventsViewModel", "Failed to get last known location")
+                onResult(null)
+            }
+        }
+    }
+}

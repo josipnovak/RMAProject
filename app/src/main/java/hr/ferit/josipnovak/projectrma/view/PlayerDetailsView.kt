@@ -1,6 +1,8 @@
 package hr.ferit.josipnovak.projectrma.view
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,6 +43,7 @@ import hr.ferit.josipnovak.projectrma.ui.FooterPlayers
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
 import hr.ferit.josipnovak.projectrma.viewmodel.PlayersViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PlayerDetailsView(modifier: Modifier = Modifier, navController: NavController, playersViewModel: PlayersViewModel, playerId: String) {
     var player by remember { mutableStateOf<User?>(null) }
@@ -128,7 +131,10 @@ fun PlayerDetailsView(modifier: Modifier = Modifier, navController: NavControlle
                 Spacer(modifier = Modifier.height(40.dp))
                 Row() {
                     Button(
-                        onClick = { /*TODO*/ },
+                        onClick = { playersViewModel.deletePlayer(player?.id ?: "") {
+                                    navController.navigate("players")
+                                }
+                        },
                         modifier = Modifier
                             .width(125.dp)
                             .height(50.dp),

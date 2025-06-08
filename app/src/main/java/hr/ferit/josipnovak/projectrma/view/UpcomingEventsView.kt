@@ -1,5 +1,8 @@
 package hr.ferit.josipnovak.projectrma.view
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,12 +41,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import hr.ferit.josipnovak.projectrma.ui.FooterEvent
 import hr.ferit.josipnovak.projectrma.R
 import hr.ferit.josipnovak.projectrma.model.Event
@@ -52,6 +59,7 @@ import hr.ferit.josipnovak.projectrma.ui.theme.LightBlue
 import hr.ferit.josipnovak.projectrma.viewmodel.EventsViewModel
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavController, eventsViewModel: EventsViewModel) {
     var events by remember { mutableStateOf<List<Event>>(emptyList()) }
@@ -73,6 +81,8 @@ fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavControll
         filterType.isEmpty() || event.type.equals(filterType, ignoreCase = true)
 
     }
+
+    val context = LocalContext.current
 
     Box(
         modifier = modifier
@@ -185,6 +195,14 @@ fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavControll
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 items(filteredEvents.size) { index ->
+                    var distanceState by remember { mutableDoubleStateOf(-1.0) }
+                    LaunchedEffect(filteredEvents[index].location) {
+                        eventsViewModel.calculateDistanceToLocation(filteredEvents[index].location, context) { distance ->
+                            if (distance != null) {
+                                distanceState = distance
+                            }
+                        }
+                    }
                     Card(
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -221,7 +239,7 @@ fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavControll
                             )
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
-                                text = "${filteredEvents[index].location.name}, ${filteredEvents[index].location.latitude.roundToInt()}, ${filteredEvents[index].location.longitude.roundToInt()}",
+                                text = "${filteredEvents[index].location.name}: ${"%.3f".format(distanceState)} km",
                                 fontSize = 16.sp,
                                 color = Color.Gray,
                                 modifier = Modifier
