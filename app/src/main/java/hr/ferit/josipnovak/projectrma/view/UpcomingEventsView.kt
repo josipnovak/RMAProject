@@ -2,6 +2,7 @@ package hr.ferit.josipnovak.projectrma.view
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,11 +42,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import hr.ferit.josipnovak.projectrma.ui.FooterEvent
 import hr.ferit.josipnovak.projectrma.R
 import hr.ferit.josipnovak.projectrma.model.Event
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
+import hr.ferit.josipnovak.projectrma.ui.theme.LightBlue
 import hr.ferit.josipnovak.projectrma.viewmodel.EventsViewModel
 import kotlin.math.roundToInt
 
@@ -62,6 +65,15 @@ fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavControll
             isCoach = coachStatus
         }
     }
+
+    var isFilterDialogVisible by remember { mutableStateOf(false) }
+    var filterType by remember { mutableStateOf("") }
+
+    val filteredEvents = events.filter { event ->
+        filterType.isEmpty() || event.type.equals(filterType, ignoreCase = true)
+
+    }
+
     Box(
         modifier = modifier
             .background(color = DarkBlue)
@@ -106,7 +118,7 @@ fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavControll
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
-                        onClick = { /*TODO*/ },
+                        onClick = { isFilterDialogVisible = true },
                         modifier = Modifier
                             .size(40.dp)
                             .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
@@ -117,6 +129,32 @@ fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavControll
                             tint = Color.Black,
                             modifier = Modifier
                         )
+                    }
+                    if (isFilterDialogVisible) {
+                        Dialog(onDismissRequest = { isFilterDialogVisible = false }) {
+                            Box(
+                                modifier = Modifier
+                                    .background(Color.White, shape = RoundedCornerShape(15.dp))
+                                    .padding(16.dp)
+                            ) {
+                                Column {
+                                    Text("Filter by Activity Type", fontSize = 18.sp, color = Color.Black)
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    listOf("Remove filter", "Training", "Match", "Other").forEach { type ->
+                                        Text(
+                                            text = type,
+                                            modifier = Modifier
+                                                .padding(8.dp)
+                                                .clickable {
+                                                    filterType = if (type == "Remove filter") "" else type
+                                                    isFilterDialogVisible = false
+                                                },
+                                            color = if (filterType == type || (filterType == "" && type == "Remove filter")) LightBlue else Color.Black
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                     Spacer(modifier = Modifier.width(15.dp))
                     IconButton(
@@ -146,7 +184,7 @@ fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavControll
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                items(events.size) { index ->
+                items(filteredEvents.size) { index ->
                     Card(
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -154,7 +192,7 @@ fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavControll
                             .fillMaxWidth()
                             .height(220.dp)
                             .padding(vertical = 8.dp),
-                        onClick = { navController.navigate("event/${events[index].id}") }
+                        onClick = { navController.navigate("event/${filteredEvents[index].id}") }
                     ) {
                         Column(
                             modifier = Modifier.fillMaxSize(),
@@ -162,28 +200,28 @@ fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavControll
                             verticalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = "${events[index].type}: ${events[index].name}",
+                                text = "${filteredEvents[index].type}: ${filteredEvents[index].name}",
                                 fontSize = 20.sp,
                                 color = Color.Black,
                                 modifier = Modifier
                             )
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
-                                text = events[index].time,
+                                text = filteredEvents[index].time,
                                 fontSize = 16.sp,
                                 color = Color.Gray,
                                 modifier = Modifier
                             )
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
-                                text = events[index].date,
+                                text = filteredEvents[index].date,
                                 fontSize = 16.sp,
                                 color = Color.Gray,
                                 modifier = Modifier
                             )
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
-                                text = "${events[index].location.name}, ${events[index].location.latitude.roundToInt()}, ${events[index].location.longitude.roundToInt()}",
+                                text = "${filteredEvents[index].location.name}, ${filteredEvents[index].location.latitude.roundToInt()}, ${filteredEvents[index].location.longitude.roundToInt()}",
                                 fontSize = 16.sp,
                                 color = Color.Gray,
                                 modifier = Modifier

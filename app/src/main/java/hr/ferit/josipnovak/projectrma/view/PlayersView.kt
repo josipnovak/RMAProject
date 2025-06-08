@@ -2,6 +2,7 @@ package hr.ferit.josipnovak.projectrma.view
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import hr.ferit.josipnovak.projectrma.ui.FooterPlayers
 import hr.ferit.josipnovak.projectrma.R
@@ -48,15 +50,25 @@ import hr.ferit.josipnovak.projectrma.model.User
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
 import hr.ferit.josipnovak.projectrma.ui.theme.LightBlue
 import hr.ferit.josipnovak.projectrma.viewmodel.PlayersViewModel
+import kotlin.text.matches
 
 @Composable
 fun PlayersView(modifier: Modifier = Modifier, navController: NavController, playersViewModel: PlayersViewModel) {
-    var searchQuery by remember { mutableStateOf("") }
-
     var userId by remember { mutableStateOf("") }
     var clubId by remember { mutableStateOf("") }
     var role by remember { mutableStateOf("") }
     var players by remember { mutableStateOf<Map<String, List<User>>>(emptyMap()) }
+
+    var isFilterDialogVisible by remember { mutableStateOf(false) }
+    var filterPosition by remember { mutableStateOf("") }
+    var sortDescending by remember { mutableStateOf(false) }
+
+    val filteredAndSortedPlayers = players
+        .filter { (position, _) -> filterPosition.isEmpty() || position == filterPosition }
+        .mapValues { (_, playerList) ->
+            if (sortDescending) playerList.sortedByDescending { it.matches }
+            else playerList.sortedBy { it.matches }
+        }
 
     LaunchedEffect(Unit){
         playersViewModel.getUserDetails(
@@ -128,7 +140,7 @@ fun PlayersView(modifier: Modifier = Modifier, navController: NavController, pla
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
-                        onClick = { /*TODO*/ },
+                        onClick = { isFilterDialogVisible = true },
                         modifier = Modifier
                             .size(40.dp)
                             .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
@@ -140,6 +152,65 @@ fun PlayersView(modifier: Modifier = Modifier, navController: NavController, pla
                             modifier = Modifier
                         )
                     }
+                    if (isFilterDialogVisible) {
+                        Dialog(onDismissRequest = { isFilterDialogVisible = false }) {
+                            Box(
+                                modifier = Modifier
+                                    .background(Color.White, shape = RoundedCornerShape(15.dp))
+                                    .padding(16.dp)
+                            ) {
+                                Column {
+                                    Text("Filter by Position", fontSize = 18.sp, color = Color.Black)
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    listOf("Remove filter", "Goalkeeper", "Defender", "Midfielder", "Attacker",).forEach { position ->
+                                        Text(
+                                            text = position,
+                                            modifier = Modifier
+                                                .padding(8.dp)
+                                                .clickable {
+                                                    if (position == "Remove filter") {
+                                                        filterPosition = ""
+                                                    } else {
+                                                        filterPosition = position
+                                                    }
+                                                    isFilterDialogVisible = false
+                                                },
+                                            color = if (filterPosition == position || (filterPosition == "" && position == "Remove filter")) LightBlue else Color.Black
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(16.dp))
+
+                                    Text("Sort by Matches", fontSize = 18.sp, color = Color.Black, textAlign = TextAlign.Center)
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Row {
+                                        Text(
+                                            text = "Ascending",
+                                            modifier = Modifier
+                                                .padding(8.dp)
+                                                .clickable {
+                                                    sortDescending = false
+                                                    isFilterDialogVisible = false
+                                                },
+                                            color = if (!sortDescending) LightBlue else Color.Black,
+                                        )
+                                        Spacer(modifier = Modifier.width(16.dp))
+                                        Text(
+                                            text = "Descending",
+                                            modifier = Modifier
+                                                .padding(8.dp)
+                                                .clickable {
+                                                    sortDescending = true
+                                                    isFilterDialogVisible = false
+                                                },
+                                            color = if (sortDescending) LightBlue else Color.Black
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     Spacer(modifier = Modifier.width(15.dp))
 
                     IconButton(
@@ -167,7 +238,7 @@ fun PlayersView(modifier: Modifier = Modifier, navController: NavController, pla
                         .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    players.forEach { (position, playerList) ->
+                    filteredAndSortedPlayers.forEach { (position, playerList) ->
                         item {
                             Text(
                                 text = position,

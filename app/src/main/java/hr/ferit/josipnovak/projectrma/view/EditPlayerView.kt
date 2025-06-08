@@ -79,7 +79,7 @@ fun EditPlayerView(modifier: Modifier = Modifier, navController: NavController, 
             .background(color = DarkBlue)
     ) {
         IconButton(
-            onClick = { /*TODO*/ },
+            onClick = { navController.navigateUp() },
             modifier = Modifier
                 .size(60.dp)
                 .padding(top = 40.dp, start = 10.dp)
