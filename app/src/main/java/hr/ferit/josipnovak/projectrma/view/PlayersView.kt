@@ -64,7 +64,7 @@ fun PlayersView(modifier: Modifier = Modifier, navController: NavController, pla
                     userId = fetchedId
                 } else if (fetchedRole == "coach") {
                     clubId = fetchedClubIdOrRole
-                    playersViewModel.fetchAndGroupPlayers(
+                    playersViewModel.getPlayers(
                         clubId = clubId,
                         onSuccess = { groupedPlayers ->
                             players = groupedPlayers

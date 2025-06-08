@@ -89,75 +89,73 @@ fun PlayerDetailsView(modifier: Modifier = Modifier, navController: NavControlle
                         .fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(40.dp))
-                player?.let{player ->
-                    Log.d("PlayerDetailsView", "Player details: $player")
-                    Text(
-                        text = player.name,
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(top = 40.dp)
-                    )
-                    Text(
-                        text = player.position,
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(top = 40.dp)
-                    )
-                    Text(
-                        text = "Matches: ${player.matches}",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(top = 40.dp)
-                    )
-                    Text(
-                        text = "Goals: ${player.goals}",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(top = 40.dp)
-                    )
-                    Text(
-                        text = "Assists: ${player.assists}",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(top = 40.dp)
-                    )
-                    Text(
-                        text = "Trainings: ${player.trainings}",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(top = 40.dp)
-                    )
-                    Spacer(modifier = Modifier.height(40.dp))
-                    Row() {
-                        Button(
-                            onClick = { /*TODO*/ },
-                            modifier = Modifier
-                                .width(125.dp)
-                                .height(50.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                            shape = RoundedCornerShape(15.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.delete),
-                                color = Color.Black,
-                                fontSize = 20.sp
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(20.dp))
-                        Button(
-                            onClick = { navController.navigate("edit_player/${player.id}") },
-                            modifier = Modifier
-                                .width(125.dp)
-                                .height(50.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                            shape = RoundedCornerShape(15.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.edit),
-                                color = Color.Black,
-                                fontSize = 20.sp
-                            )
-                        }
+                Text(
+                    text = "${player?.name}",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(top = 40.dp)
+                )
+                Text(
+                    text = "${player?.position}",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(top = 40.dp)
+                )
+                Text(
+                    text = "Matches: ${player?.matches}",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(top = 40.dp)
+                )
+                Text(
+                    text = "Goals: ${player?.goals}",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(top = 40.dp)
+                )
+                Text(
+                    text = "Assists: ${player?.assists}",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(top = 40.dp)
+                )
+                Text(
+                    text = "Trainings: ${player?.trainings}",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(top = 40.dp)
+                )
+                Spacer(modifier = Modifier.height(40.dp))
+                Row() {
+                    Button(
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier
+                            .width(125.dp)
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.delete),
+                            color = Color.Black,
+                            fontSize = 20.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(20.dp))
+                    Button(
+                        onClick = { navController.navigate("edit_player/${player?.id}") },
+                        modifier = Modifier
+                            .width(125.dp)
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.edit),
+                            color = Color.Black,
+                            fontSize = 20.sp
+                        )
+
                     }
                 }
             }

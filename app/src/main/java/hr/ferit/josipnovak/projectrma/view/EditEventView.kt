@@ -31,6 +31,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DataUsage
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Home
@@ -53,6 +54,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -77,8 +79,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
 import androidx.navigation.NavController
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.rpc.context.AttributeContext.Auth
+import hr.ferit.josipnovak.projectrma.model.Event
+import hr.ferit.josipnovak.projectrma.model.Location
 import hr.ferit.josipnovak.projectrma.ui.FooterEvent
 import hr.ferit.josipnovak.projectrma.ui.theme.D9
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
@@ -94,14 +104,34 @@ import hr.ferit.josipnovak.projectrma.view.StartScreenView
 import hr.ferit.josipnovak.projectrma.view.UpcomingEventsView
 import hr.ferit.josipnovak.projectrma.view.AccountDetailsView
 import hr.ferit.josipnovak.projectrma.viewmodel.AuthViewModel
+import hr.ferit.josipnovak.projectrma.viewmodel.EventsViewModel
 
 
 @Composable
-fun EditEventView(modifier: Modifier = Modifier, navController: NavController) {
+fun EditEventView(modifier: Modifier = Modifier, navController: NavController, eventsViewModel: EventsViewModel, eventId: String) {
+    var event by remember { mutableStateOf<Event?>(null) }
+    var eventType by remember { mutableStateOf("") }
     var eventName by remember { mutableStateOf("") }
     var eventDate by remember { mutableStateOf("") }
     var eventTime by remember { mutableStateOf("") }
-    var eventLocation by remember { mutableStateOf("") }
+    var isMapVisible by remember { mutableStateOf(false) }
+    var locationName by remember { mutableStateOf("") }
+    var selectedLocation by remember { mutableStateOf<LatLng?>(null) }
+    LaunchedEffect(eventId) {
+        try {
+            event = eventsViewModel.getEventById(eventId)
+            event?.let {
+                eventType = it.type
+                eventName = it.name
+                eventDate = it.date
+                eventTime = it.time
+                locationName = it.location.name
+                selectedLocation = it.location.let { LatLng(it.latitude, it.longitude) }
+            }
+        } catch (e: Exception) {
+            event = null
+        }
+    }
 
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
@@ -164,6 +194,43 @@ fun EditEventView(modifier: Modifier = Modifier, navController: NavController) {
                 )
                 Spacer(modifier = Modifier.height(40.dp))
 
+                Row(
+                    modifier = modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = { eventType = "Training" },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (eventType == "Training") Color.White else DarkBlue
+                        ),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Text(text = "Training", color = if (eventType == "Training") Color.Black else Color.White)
+                    }
+
+                    Button(
+                        onClick = { eventType = "Match" },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (eventType == "Match") Color.White else DarkBlue
+                        ),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Text(text = "Match", color = if (eventType == "Match") Color.Black else Color.White)
+                    }
+
+                    Button(
+                        onClick = { eventType = "Other" },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (eventType == "Other") Color.White else DarkBlue,
+
+                            ),
+                        shape = RoundedCornerShape(15.dp)
+                    ) {
+                        Text(text = "Other", color = if (eventType == "Other") Color.Black else Color.White)
+                    }
+                }
+
                 OutlinedTextField(
                     value = eventName,
                     onValueChange = { eventName = it },
@@ -210,12 +277,101 @@ fun EditEventView(modifier: Modifier = Modifier, navController: NavController) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                /*TODO LOCATION PICKER*/
+                OutlinedTextField(
+                    value = locationName,
+                    onValueChange = { locationName = it },
+                    label = { Text(text = stringResource(id = R.string.location_name)) },
+                    modifier = Modifier
+                        .width(300.dp)
+                        .height(60.dp),
+                    shape = RoundedCornerShape(15.dp)
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Button(
+                    onClick = { isMapVisible = !isMapVisible },
+                    modifier = Modifier
+                        .width(200.dp)
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(15.dp)
+                ) {
+                    Text(
+                        text = if (isMapVisible) "Close map" else "Open map",
+                        color = Color.Black,
+                        fontSize = 16.sp
+                    )
+                }
+
+                if (isMapVisible) {
+                    androidx.compose.ui.window.Dialog(
+                        onDismissRequest = { isMapVisible = false }
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.White)
+                        ) {
+                            val cameraPositionState = rememberCameraPositionState {
+                                position = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 2f)
+                            }
+
+                            GoogleMap(
+                                modifier = Modifier.fillMaxSize(),
+                                cameraPositionState = cameraPositionState,
+                                onMapClick = { latLng ->
+                                    selectedLocation = latLng
+                                }
+                            ) {
+                                selectedLocation?.let {
+                                    Marker(
+                                        state = MarkerState(position = it),
+                                        title = "Selected Location"
+                                    )
+                                }
+                            }
+
+                            IconButton(
+                                onClick = { isMapVisible = false },
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(16.dp)
+                                    .size(20.dp)
+                                    .background(DarkBlue, shape = CircleShape)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Close Map",
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(40.dp))
 
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        val location = Location(
+                            name = locationName,
+                            latitude = selectedLocation?.latitude ?: 0.0,
+                            longitude = selectedLocation?.longitude ?: 0.0
+                        )
+                        val event = Event(
+                            id = event?.id ?: "",
+                            type = eventType,
+                            name = eventName,
+                            date = eventDate,
+                            time = eventTime,
+                            location = location
+                        )
+                        Log.d("AddNewEventView", "Editing event: $event")
+                        eventsViewModel.updatePlayer(event)
+                        Log.d("AddNewEventView", "Event edited: $event")
+                        navController.navigate("upcoming_events")
+                    },
                     modifier = Modifier
                         .width(150.dp)
                         .height(40.dp),

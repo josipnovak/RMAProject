@@ -1,5 +1,6 @@
 package hr.ferit.josipnovak.projectrma.view
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -26,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -41,13 +44,20 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import hr.ferit.josipnovak.projectrma.ui.FooterEvent
 import hr.ferit.josipnovak.projectrma.R
+import hr.ferit.josipnovak.projectrma.model.Event
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
 import hr.ferit.josipnovak.projectrma.viewmodel.EventsViewModel
+import kotlin.math.roundToInt
 
 @Composable
 fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavController, eventsViewModel: EventsViewModel) {
-    var searchQuery by remember { mutableStateOf("") }
-    var distanceToStadium by remember { mutableDoubleStateOf(0.0) }
+    var events by remember { mutableStateOf<List<Event>>(emptyList()) }
+    LaunchedEffect(Unit) {
+        eventsViewModel.getUpcomingEvents { fetchedEvents ->
+            events = fetchedEvents
+            Log.d("UpcomingEventsView", "Fetched events: $events")
+        }
+    }
     Box(
         modifier = modifier
             .background(color = DarkBlue)
@@ -88,41 +98,27 @@ fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavControll
                 modifier = Modifier
                     .width(350.dp)
                     .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ){
-                TextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    label = { Text(text = stringResource(id = R.string.search)) },
+                IconButton(
+                    onClick = { /*TODO*/ },
                     modifier = Modifier
-                        .width(225.dp)
-                        .height(60.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color.Black,
-                        unfocusedIndicatorColor = Color.Black,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        cursorColor = Color.Black,
-                        focusedLabelColor = Color.Black,
-                        unfocusedLabelColor = Color.Black,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black
-                    ),
-                    shape = RoundedCornerShape(15.dp),
-                    trailingIcon = {
-                        IconButton(
-                            onClick = { /*TODO*/ },
-                        ) {
-                            Icon(imageVector = Icons.Filled.Search, contentDescription = null, tint = Color.Black)
-                        }
-                    }
-                )
-
+                        .size(40.dp)
+                        .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.FilterAlt,
+                        contentDescription = null,
+                        tint = Color.Black,
+                        modifier = Modifier
+                    )
+                }
+                Spacer(modifier = Modifier.width(15.dp))
                 IconButton(
                     onClick = { navController.navigate("add_event") },
                     modifier = Modifier
-                        .size(60.dp)
+                        .size(40.dp)
                         .background(color = Color.White, shape = RoundedCornerShape(15.dp)),
                 ) {
                     Icon(
@@ -145,7 +141,7 @@ fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavControll
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                items(10) { index ->
+                items(events.size) { index ->
                     Card(
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -153,7 +149,7 @@ fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavControll
                             .fillMaxWidth()
                             .height(220.dp)
                             .padding(vertical = 8.dp),
-                        onClick = { /*TODO*/ }
+                        onClick = { navController.navigate("event/${events[index].id}") }
                     ) {
                         Column(
                             modifier = Modifier.fillMaxSize(),
@@ -161,28 +157,28 @@ fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavControll
                             verticalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = "Name of the event $index",
+                                text = "${events[index].type}: ${events[index].name}",
                                 fontSize = 20.sp,
                                 color = Color.Black,
                                 modifier = Modifier
                             )
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
-                                text = "HH:MM",
+                                text = events[index].time,
                                 fontSize = 16.sp,
                                 color = Color.Gray,
                                 modifier = Modifier
                             )
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
-                                text = "Day, 27. May",
+                                text = events[index].date,
                                 fontSize = 16.sp,
                                 color = Color.Gray,
                                 modifier = Modifier
                             )
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
-                                text = "Stadium Name, $distanceToStadium km away",
+                                text = "${events[index].location.name}, ${events[index].location.latitude.roundToInt()}, ${events[index].location.longitude.roundToInt()}",
                                 fontSize = 16.sp,
                                 color = Color.Gray,
                                 modifier = Modifier

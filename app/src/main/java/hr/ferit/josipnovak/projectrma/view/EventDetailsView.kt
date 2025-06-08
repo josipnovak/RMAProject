@@ -22,6 +22,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,12 +36,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import hr.ferit.josipnovak.projectrma.R
+import hr.ferit.josipnovak.projectrma.model.Event
+import hr.ferit.josipnovak.projectrma.model.User
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
 import hr.ferit.josipnovak.projectrma.ui.FooterEvent
+import hr.ferit.josipnovak.projectrma.viewmodel.EventsViewModel
 
 
 @Composable
-fun EventDetailsView(modifier: Modifier = Modifier, navController: NavController) {
+fun EventDetailsView(modifier: Modifier = Modifier, navController: NavController, eventsViewModel: EventsViewModel, eventId: String) {
+    var event by remember { mutableStateOf<Event?>(null) }
+    LaunchedEffect(eventId) {
+        try {
+            event = eventsViewModel.getEventById(eventId)
+        } catch (e: Exception) {
+            event = null
+        }
+    }
     Box(
         modifier = modifier
             .background(color = DarkBlue)
@@ -76,28 +92,28 @@ fun EventDetailsView(modifier: Modifier = Modifier, navController: NavController
                 )
                 Spacer(modifier = Modifier.height(40.dp))
                 Text(
-                    text = "Name",
+                    text = "${event?.type}: ${event?.name}",
                     color = Color.White,
                     fontSize = 30.sp,
                     modifier = Modifier.padding(top = 40.dp)
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
-                    text = "Time",
+                    text = "${event?.time}",
                     color = Color.White,
                     fontSize = 30.sp,
                     modifier = Modifier.padding(top = 40.dp)
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
-                    text = "Date",
+                    text = "${event?.date}",
                     color = Color.White,
                     fontSize = 30.sp,
                     modifier = Modifier.padding(top = 40.dp)
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
-                    text = "Location",
+                    text = "${event?.location?.name}",
                     color = Color.White,
                     fontSize = 30.sp,
                     modifier = Modifier.padding(top = 40.dp)
@@ -120,7 +136,7 @@ fun EventDetailsView(modifier: Modifier = Modifier, navController: NavController
                     }
                     Spacer(modifier = Modifier.width(20.dp))
                     Button(
-                        onClick = { /*TODO*/ },
+                        onClick = { navController.navigate("edit_event/${event?.id}") },
                         modifier = Modifier
                             .width(125.dp)
                             .height(50.dp),

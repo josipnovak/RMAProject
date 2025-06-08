@@ -267,7 +267,7 @@ fun AddNewEventView(modifier: Modifier = Modifier, navController: NavController,
                 OutlinedTextField(
                     value = locationName,
                     onValueChange = { locationName = it },
-                    label = { Text(text = stringResource(id = R.string.event_name)) },
+                    label = { Text(text = stringResource(id = R.string.location_name)) },
                     modifier = Modifier
                         .width(300.dp)
                         .height(60.dp),

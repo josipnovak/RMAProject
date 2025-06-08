@@ -93,7 +93,9 @@ import hr.ferit.josipnovak.projectrma.view.UpcomingEventsView
 import hr.ferit.josipnovak.projectrma.view.AccountDetailsView
 import hr.ferit.josipnovak.projectrma.view.AddNewEventView
 import hr.ferit.josipnovak.projectrma.view.AddNewPlayerView
+import hr.ferit.josipnovak.projectrma.view.EditEventView
 import hr.ferit.josipnovak.projectrma.view.EditPlayerView
+import hr.ferit.josipnovak.projectrma.view.EventDetailsView
 import hr.ferit.josipnovak.projectrma.view.PlayerDetailsView
 import hr.ferit.josipnovak.projectrma.viewmodel.AuthViewModel
 import hr.ferit.josipnovak.projectrma.viewmodel.EventsViewModel
@@ -130,8 +132,6 @@ class MainActivity : ComponentActivity() {
                             val playerId = backStackEntry.arguments?.getString("playerId")
                             if (playerId != null) {
                                 PlayerDetailsView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, playersViewModel = playersViewModel, playerId = playerId)
-                            } else {
-                                Log.e("PlayersView", "Player ID is null")
                             }
                         }
                         composable("add_new_player") { AddNewPlayerView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, playersViewModel = playersViewModel) }
@@ -139,11 +139,21 @@ class MainActivity : ComponentActivity() {
                             val playerId = backStackEntry.arguments?.getString("playerId")
                             if (playerId != null) {
                                 EditPlayerView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, playersViewModel = playersViewModel, playerId = playerId)
-                            } else {
-                                Log.e("PlayersView", "Player ID is null")
                             }
                         }
                         composable("add_event") { AddNewEventView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, eventsViewModel = eventsViewModel) }
+                        composable("event/{eventId}") { backStackEntry ->
+                            val eventId = backStackEntry.arguments?.getString("eventId")
+                            if (eventId != null) {
+                                EventDetailsView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, eventsViewModel = eventsViewModel, eventId = eventId, )
+                            }
+                        }
+                        composable("edit_event/{eventId}") { backStackEntry ->
+                            val eventId = backStackEntry.arguments?.getString("eventId")
+                            if (eventId != null) {
+                                EditEventView(modifier = Modifier.padding(bottom = 25.dp), navController = navController, eventsViewModel = eventsViewModel, eventId = eventId)
+                            }
+                        }
                     }
                 }
             }

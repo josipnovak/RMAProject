@@ -48,7 +48,7 @@ class PlayersViewModel(
     }
 
 
-    fun fetchAndGroupPlayers(
+    fun getPlayers(
         clubId: String,
         onSuccess: (Map<String, List<User>>) -> Unit,
         onError: (String) -> Unit
