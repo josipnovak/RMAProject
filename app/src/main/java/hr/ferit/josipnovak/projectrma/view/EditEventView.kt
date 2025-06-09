@@ -101,14 +101,13 @@ import hr.ferit.josipnovak.projectrma.view.RegisterCoachView
 import hr.ferit.josipnovak.projectrma.view.RegisterPlayerView
 import java.util.Calendar
 import hr.ferit.josipnovak.projectrma.view.StartScreenView
-import hr.ferit.josipnovak.projectrma.view.UpcomingEventsView
 import hr.ferit.josipnovak.projectrma.view.AccountDetailsView
 import hr.ferit.josipnovak.projectrma.viewmodel.AuthViewModel
-import hr.ferit.josipnovak.projectrma.viewmodel.EventsViewModel
+import hr.ferit.josipnovak.projectrma.viewmodel.EditEventViewModel
 
 
 @Composable
-fun EditEventView(modifier: Modifier = Modifier, navController: NavController, eventsViewModel: EventsViewModel, eventId: String) {
+fun EditEventView(modifier: Modifier = Modifier, navController: NavController, editEventViewModel: EditEventViewModel, eventId: String) {
     var event by remember { mutableStateOf<Event?>(null) }
     var eventType by remember { mutableStateOf("") }
     var eventName by remember { mutableStateOf("") }
@@ -119,7 +118,7 @@ fun EditEventView(modifier: Modifier = Modifier, navController: NavController, e
     var selectedLocation by remember { mutableStateOf<LatLng?>(null) }
     LaunchedEffect(eventId) {
         try {
-            event = eventsViewModel.getEventById(eventId)
+            event = editEventViewModel.getEventById(eventId)
             event?.let {
                 eventType = it.type
                 eventName = it.name
@@ -369,7 +368,7 @@ fun EditEventView(modifier: Modifier = Modifier, navController: NavController, e
                             location = location
                         )
                         Log.d("AddNewEventView", "Editing event: $event")
-                        eventsViewModel.updateEvent(event)
+                        editEventViewModel.updateEvent(event)
                         Log.d("AddNewEventView", "Event edited: $event")
                         navController.navigate("upcoming_events")
                     },

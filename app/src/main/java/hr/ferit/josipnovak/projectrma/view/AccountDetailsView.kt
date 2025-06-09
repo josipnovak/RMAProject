@@ -40,16 +40,16 @@ import hr.ferit.josipnovak.projectrma.R
 import hr.ferit.josipnovak.projectrma.model.Club
 import hr.ferit.josipnovak.projectrma.model.User
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
+import hr.ferit.josipnovak.projectrma.viewmodel.AccountDetailsViewModel
 import hr.ferit.josipnovak.projectrma.viewmodel.AuthViewModel
-import hr.ferit.josipnovak.projectrma.viewmodel.PlayersViewModel
 
 @Composable
-fun AccountDetailsView(modifier: Modifier = Modifier, navController: NavController, playersViewModel: PlayersViewModel) {
+fun AccountDetailsView(modifier: Modifier = Modifier, navController: NavController, accountDetailsViewModel: AccountDetailsViewModel) {
     var user by remember { mutableStateOf<User?>(null) }
     var club by remember { mutableStateOf<Club?>(null) }
 
     LaunchedEffect(Unit) {
-        playersViewModel.getUserAndClubData { fetchedUser, fetchedClub ->
+        accountDetailsViewModel.getUserAndClubData { fetchedUser, fetchedClub ->
             user = fetchedUser
             club = fetchedClub
             Log.d("AccountDetailsView", "User: $user, Club: $club")
@@ -125,7 +125,7 @@ fun AccountDetailsView(modifier: Modifier = Modifier, navController: NavControll
                 Spacer(modifier = Modifier.height(30.dp))
                 Button(
                     onClick = {
-                        playersViewModel.logout()
+                        accountDetailsViewModel.logout()
                         navController.navigate("start")
                     },
                     modifier = Modifier

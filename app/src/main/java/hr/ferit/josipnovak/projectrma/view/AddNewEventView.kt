@@ -76,6 +76,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.isPopupLayout
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -101,19 +102,17 @@ import hr.ferit.josipnovak.projectrma.view.RegisterCoachView
 import hr.ferit.josipnovak.projectrma.view.RegisterPlayerView
 import java.util.Calendar
 import hr.ferit.josipnovak.projectrma.view.StartScreenView
-import hr.ferit.josipnovak.projectrma.view.UpcomingEventsView
 import hr.ferit.josipnovak.projectrma.view.AccountDetailsView
 import hr.ferit.josipnovak.projectrma.viewmodel.AuthViewModel
-import hr.ferit.josipnovak.projectrma.viewmodel.EventsViewModel
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import hr.ferit.josipnovak.projectrma.model.Event
 import hr.ferit.josipnovak.projectrma.model.Location
-
+import hr.ferit.josipnovak.projectrma.viewmodel.AddEventViewModel
 @Composable
-fun AddNewEventView(modifier: Modifier = Modifier, navController: NavController, eventsViewModel: EventsViewModel) {
+fun AddNewEventView(modifier: Modifier = Modifier, navController: NavController, addEventViewModel: AddEventViewModel) {
     var eventType by remember { mutableStateOf("Training") }
     var eventName by remember { mutableStateOf("") }
     var eventDate by remember { mutableStateOf("") }
@@ -125,7 +124,7 @@ fun AddNewEventView(modifier: Modifier = Modifier, navController: NavController,
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
 
-    val message by eventsViewModel.message.collectAsState()
+    val message by addEventViewModel.message.collectAsState()
 
     val datePickerDialog = DatePickerDialog(
         context,
@@ -296,7 +295,7 @@ fun AddNewEventView(modifier: Modifier = Modifier, navController: NavController,
                 }
 
                 if (isMapVisible) {
-                    androidx.compose.ui.window.Dialog(
+                    Dialog(
                         onDismissRequest = { isMapVisible = false }
                     ) {
                         Box(
@@ -357,7 +356,7 @@ fun AddNewEventView(modifier: Modifier = Modifier, navController: NavController,
                             time = eventTime,
                             location = location
                         )
-                        eventsViewModel.addNewEvent(event) {
+                        addEventViewModel.addNewEvent(event) {
                             navController.navigate("upcoming_events")
                         }
                     },

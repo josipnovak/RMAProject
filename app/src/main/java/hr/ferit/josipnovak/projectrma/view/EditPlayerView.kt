@@ -40,10 +40,10 @@ import hr.ferit.josipnovak.projectrma.R
 import hr.ferit.josipnovak.projectrma.model.User
 import hr.ferit.josipnovak.projectrma.ui.FooterPlayers
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
-import hr.ferit.josipnovak.projectrma.viewmodel.PlayersViewModel
+import hr.ferit.josipnovak.projectrma.viewmodel.EditPlayerViewModel
 
 @Composable
-fun EditPlayerView(modifier: Modifier = Modifier, navController: NavController, playersViewModel: PlayersViewModel, playerId: String) {
+fun EditPlayerView(modifier: Modifier = Modifier, navController: NavController, editPlayerViewModel: EditPlayerViewModel, playerId: String) {
     var player by remember { mutableStateOf<User?>(null) }
     var name by remember { mutableStateOf("") }
     var position by remember { mutableStateOf("") }
@@ -58,7 +58,7 @@ fun EditPlayerView(modifier: Modifier = Modifier, navController: NavController, 
 
     LaunchedEffect(playerId) {
         try {
-            player = playersViewModel.getPlayerById(playerId)
+            player = editPlayerViewModel.getPlayerById(playerId)
             player?.let {
                 name = it.name
                 position = it.position
@@ -208,7 +208,7 @@ fun EditPlayerView(modifier: Modifier = Modifier, navController: NavController, 
                             email = email,
                             role = role
                         )
-                        playersViewModel.updatePlayer(updatedPlayer)
+                        editPlayerViewModel.updatePlayer(updatedPlayer)
                         navController.navigate("player/${playerId}")
                     },
                     modifier = Modifier

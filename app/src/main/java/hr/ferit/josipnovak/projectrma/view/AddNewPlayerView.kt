@@ -1,6 +1,5 @@
 package hr.ferit.josipnovak.projectrma.view
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,16 +38,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import hr.ferit.josipnovak.projectrma.R
 import hr.ferit.josipnovak.projectrma.model.User
 import hr.ferit.josipnovak.projectrma.ui.FooterPlayers
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
-import hr.ferit.josipnovak.projectrma.viewmodel.PlayersViewModel
+import hr.ferit.josipnovak.projectrma.viewmodel.AddPlayerViewModel
 
 @Composable
-fun AddNewPlayerView(modifier: Modifier = Modifier, navController: NavController, playersViewModel: PlayersViewModel) {
+fun AddNewPlayerView(modifier: Modifier = Modifier, navController: NavController, addPlayerViewModel: AddPlayerViewModel) {
     var name by remember { mutableStateOf("") }
     var position by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
@@ -59,10 +57,10 @@ fun AddNewPlayerView(modifier: Modifier = Modifier, navController: NavController
 
     var clubId by remember { mutableStateOf("") }
 
-    val message by playersViewModel.message.collectAsState()
+    val message by addPlayerViewModel.message.collectAsState()
 
     LaunchedEffect(Unit){
-        playersViewModel.getUserDetails(
+        addPlayerViewModel.getUserDetails(
             onSuccess = { fetchedId, fetchedClubIdOrRole, fetchedRole ->
                if (fetchedRole == "coach") {
                     clubId = fetchedClubIdOrRole
@@ -209,7 +207,7 @@ fun AddNewPlayerView(modifier: Modifier = Modifier, navController: NavController
                             clubId = clubId,
                             role = "player",
                         )
-                        playersViewModel.addNewPlayer(user, clubId){
+                        addPlayerViewModel.addNewPlayer(user, clubId){
                             navController.navigateUp()
                         }
                     },

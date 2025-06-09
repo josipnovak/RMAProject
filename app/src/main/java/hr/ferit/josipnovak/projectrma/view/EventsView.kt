@@ -1,8 +1,5 @@
 package hr.ferit.josipnovak.projectrma.view
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,14 +20,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,25 +41,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberPermissionState
 import hr.ferit.josipnovak.projectrma.ui.FooterEvent
 import hr.ferit.josipnovak.projectrma.R
 import hr.ferit.josipnovak.projectrma.model.Event
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
 import hr.ferit.josipnovak.projectrma.ui.theme.LightBlue
 import hr.ferit.josipnovak.projectrma.viewmodel.EventsViewModel
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun UpcomingEventsView(modifier: Modifier = Modifier, navController: NavController, eventsViewModel: EventsViewModel) {
+fun EventsView(modifier: Modifier = Modifier, navController: NavController, eventsViewModel: EventsViewModel) {
     var events by remember { mutableStateOf<List<Event>>(emptyList()) }
     var isCoach by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        eventsViewModel.getUpcomingEvents { fetchedEvents ->
+        eventsViewModel.getEvents { fetchedEvents ->
             events = fetchedEvents
             Log.d("UpcomingEventsView", "Fetched events: $events")
         }

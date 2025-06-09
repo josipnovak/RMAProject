@@ -39,26 +39,25 @@ import hr.ferit.josipnovak.projectrma.model.Event
 import hr.ferit.josipnovak.projectrma.model.User
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
 import hr.ferit.josipnovak.projectrma.ui.theme.LightBlue
-import hr.ferit.josipnovak.projectrma.viewmodel.EventsViewModel
-import hr.ferit.josipnovak.projectrma.viewmodel.PlayersViewModel
+import hr.ferit.josipnovak.projectrma.viewmodel.MainScreenViewModel
 import kotlin.compareTo
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainScreenView(modifier: Modifier = Modifier, navController: NavController, playersViewModel: PlayersViewModel, eventsViewModel: EventsViewModel) {
+fun MainScreenView(modifier: Modifier = Modifier, navController: NavController, mainScreenViewModel: MainScreenViewModel) {
     var user by remember { mutableStateOf<User?>(null) }
     var club by remember { mutableStateOf<Club?>(null) }
     var events by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
     var bestPlayers by remember { mutableStateOf<List<User>>(emptyList()) }
     LaunchedEffect(Unit) {
-        playersViewModel.getUserAndClubData { fetchedUser, fetchedClub ->
+        mainScreenViewModel.getUserAndClubData { fetchedUser, fetchedClub ->
             user = fetchedUser
             club = fetchedClub
         }
-        playersViewModel.getBestPlayers { fetchedPlayers ->
+        mainScreenViewModel.getBestPlayers { fetchedPlayers ->
             bestPlayers = fetchedPlayers
         }
-        eventsViewModel.getEventsForThisWeek { fetchedEvents ->
+        mainScreenViewModel.getEventsForThisWeek { fetchedEvents ->
             events = fetchedEvents
             Log.d("MainScreenView", "Fetched events: $events")
         }
@@ -168,11 +167,10 @@ fun MainScreenView(modifier: Modifier = Modifier, navController: NavController, 
                                     .height(40.dp)
                                     .background(color = LightBlue)
                                     .padding(horizontal = 10.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
+                                horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = "Ime prezime", color = Color.Black, fontSize = 18.sp)
-                                Text(text = "25/5", color = Color.Black, fontSize = 18.sp)
+                                Text(text = "Matches: ${user?.matches}", color = Color.Black, fontSize = 18.sp)
                             }
                             Spacer(modifier = Modifier.height(10.dp))
                             Row(
@@ -181,11 +179,10 @@ fun MainScreenView(modifier: Modifier = Modifier, navController: NavController, 
                                     .height(40.dp)
                                     .background(color = LightBlue)
                                     .padding(horizontal = 10.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
+                                horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = "Ime prezime", color = Color.Black, fontSize = 18.sp)
-                                Text(text = "25/5", color = Color.Black, fontSize = 18.sp)
+                                Text(text = "Goals: ${user?.goals}", color = Color.Black, fontSize = 18.sp)
                             }
                             Spacer(modifier = Modifier.height(10.dp))
                             Row(
@@ -194,11 +191,10 @@ fun MainScreenView(modifier: Modifier = Modifier, navController: NavController, 
                                     .height(40.dp)
                                     .background(color = LightBlue)
                                     .padding(horizontal = 10.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
+                                horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = "Ime prezime", color = Color.Black, fontSize = 18.sp)
-                                Text(text = "25/5", color = Color.Black, fontSize = 18.sp)
+                                Text(text = "Assists: ${user?.assists}", color = Color.Black, fontSize = 18.sp)
                             }
                         }
                     }

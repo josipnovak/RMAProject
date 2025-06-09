@@ -1,6 +1,8 @@
 package hr.ferit.josipnovak.projectrma.view
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,18 +22,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,8 +48,8 @@ import hr.ferit.josipnovak.projectrma.model.User
 import hr.ferit.josipnovak.projectrma.ui.theme.DarkBlue
 import hr.ferit.josipnovak.projectrma.ui.theme.LightBlue
 import hr.ferit.josipnovak.projectrma.viewmodel.PlayersViewModel
-import kotlin.text.matches
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PlayersView(modifier: Modifier = Modifier, navController: NavController, playersViewModel: PlayersViewModel) {
     var userId by remember { mutableStateOf("") }
@@ -286,7 +284,7 @@ fun PlayersView(modifier: Modifier = Modifier, navController: NavController, pla
                     }
                 }
             }else{
-                /* TODO */
+                PlayerDetailsView(modifier = Modifier, navController =  navController, playersViewModel = playersViewModel, playerId = userId)
             }
             FooterPlayers(navController = navController)
         }
