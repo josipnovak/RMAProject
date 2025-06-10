@@ -381,7 +381,7 @@ fun EditEventView(modifier: Modifier = Modifier, navController: NavController, e
                     shape = RoundedCornerShape(15.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.add),
+                        text = stringResource(R.string.edit),
                         color = Color.Black,
                         fontSize = 20.sp
                     )

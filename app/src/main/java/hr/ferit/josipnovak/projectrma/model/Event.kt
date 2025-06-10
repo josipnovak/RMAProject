@@ -10,5 +10,6 @@ data class Event(
     val date: String = "",
     val time: String = "",
     val createdAt: Timestamp? = null,
+    var notified: Boolean = false,
     val location: Location = Location()
 )

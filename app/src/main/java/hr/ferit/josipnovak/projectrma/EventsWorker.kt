@@ -36,13 +36,18 @@ class EventsWorker(context: Context, workerParams: WorkerParameters) :
             Event(
                 id = document.getString("id") ?: "",
                 name = document.getString("name") ?: "",
-                type = document.getString("type") ?: ""
+                type = document.getString("type") ?: "",
+                notified = document.getBoolean("notified") == true,
             )
         }
 
         val latestEvent = events.firstOrNull()
 
-        if (latestEvent != null) {
+        if (latestEvent != null && !latestEvent.notified) {
+            db.collection("events")
+                .document(latestEvent.id)
+                .update("notified", true)
+                .await()
             showEventNotification(applicationContext, latestEvent)
         }
         return Result.success()
