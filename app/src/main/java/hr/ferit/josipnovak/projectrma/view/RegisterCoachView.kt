@@ -73,7 +73,7 @@ fun RegisterCoachView(modifier: Modifier = Modifier, navController: NavControlle
                 horizontalArrangement = Arrangement.Center
             ) {
                 Button(
-                    onClick = { /*Do nothing*/ },
+                    onClick = {  },
                     modifier = Modifier
                         .width(135.dp)
                         .height(45.dp),

@@ -30,14 +30,13 @@ class AuthViewModel(
             return
         }
 
-        viewModelScope.launch {
-            auth.loginUser(email, password) { success, error ->
-                if (success) {
-                    onSuccess()
-                } else {
-                    _message.value = context.getString(R.string.error_message)
-                }
+        auth.loginUser(email, password) { success, error ->
+            if (success) {
+                onSuccess()
+            } else {
+                _message.value = context.getString(R.string.error_message)
             }
+
         }
     }
 
@@ -73,16 +72,9 @@ class AuthViewModel(
                             createUserAccount(name, email, password, role, clubId, position, onSuccess) { userId ->
                                 db.collection("clubs").document(clubId)
                                     .update("players", com.google.firebase.firestore.FieldValue.arrayUnion(userId))
-                                    .addOnFailureListener { e ->
-                                        _message.value = context.getString(R.string.internal_error)
-                                    }
+
                             }
-                        } else {
-                            _message.value = context.getString(R.string.club_not_found)
                         }
-                    }
-                    .addOnFailureListener { e ->
-                        _message.value = context.getString(R.string.internal_error)
                     }
             } else if (role == "coach") {
                 auth.registerUser(email, password) { success, error ->
@@ -108,15 +100,7 @@ class AuthViewModel(
                             .addOnSuccessListener {
                                 db.collection("users").document(userId).set(user)
                                     .addOnSuccessListener { onSuccess() }
-                                    .addOnFailureListener { e ->
-                                        _message.value = context.getString(R.string.internal_error)
-                                    }
                             }
-                            .addOnFailureListener { e ->
-                                _message.value = context.getString(R.string.internal_error)
-                            }
-                    } else {
-                        _message.value = context.getString(R.string.internal_error)
                     }
                 }
             }
@@ -152,8 +136,6 @@ class AuthViewModel(
                     .addOnFailureListener { e ->
                         _message.value = e.message ?: "Failed to save user"
                     }
-            } else {
-                _message.value = error ?: "Registration failed"
             }
         }
     }

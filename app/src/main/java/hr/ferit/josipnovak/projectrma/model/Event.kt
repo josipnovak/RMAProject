@@ -1,5 +1,6 @@
 package hr.ferit.josipnovak.projectrma.model
 
+import android.R
 import com.google.firebase.Timestamp
 
 data class Event(
@@ -10,6 +11,6 @@ data class Event(
     val date: String = "",
     val time: String = "",
     val createdAt: Timestamp? = null,
-    var notified: Boolean = false,
+    val notifiedUsers: List<String> = emptyList(),
     val location: Location = Location()
 )

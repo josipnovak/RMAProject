@@ -161,7 +161,7 @@ fun EditEventView(modifier: Modifier = Modifier, navController: NavController, e
             .background(color = DarkBlue)
     ) {
         IconButton(
-            onClick = { /*TODO*/ },
+            onClick = { navController.navigateUp() },
             modifier = Modifier
                 .size(60.dp)
                 .padding(top = 40.dp, start = 20.dp)

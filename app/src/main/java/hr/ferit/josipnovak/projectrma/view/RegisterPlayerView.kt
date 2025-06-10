@@ -95,7 +95,7 @@ fun RegisterPlayerView(modifier: Modifier = Modifier, navController: NavControll
                     Spacer(modifier = Modifier.width(30.dp))
 
                     Button(
-                        onClick = { /*Do nothing*/ },
+                        onClick = {  },
                         modifier = Modifier
                             .width(135.dp)
                             .height(45.dp),

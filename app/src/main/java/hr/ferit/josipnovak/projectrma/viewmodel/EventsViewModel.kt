@@ -16,6 +16,9 @@ import hr.ferit.josipnovak.projectrma.model.Location
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class EventsViewModel(
     private val fbAuth: FirebaseAuth,
@@ -28,6 +31,8 @@ class EventsViewModel(
     fun getEvents(
         onSuccess: (List<Event>) -> Unit
     ){
+        val todayDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        Log.d("EventsViewModel", "Today's date: $todayDate")
         val currentUser = fbAuth.getCurrentUser()
         if (currentUser != null) {
             val email = currentUser.email
@@ -41,6 +46,7 @@ class EventsViewModel(
                             val clubId = user.getString("clubId") ?: "No Club ID"
                             db.collection("events")
                                 .whereEqualTo("clubId", clubId)
+                                .whereLessThan("date", todayDate)
                                 .get()
                                 .addOnSuccessListener { documents ->
                                     val events = documents.map { document ->
@@ -63,9 +69,6 @@ class EventsViewModel(
                                     }
                                     onSuccess(events)
                                     Log.d("EventsViewModel", "Fetched events: $events")
-                                }
-                                .addOnFailureListener { e ->
-                                    Log.e("EventsViewModel", "Error fetching events: ${e.message}")
                                 }
                         }
                     }
@@ -119,7 +122,7 @@ class EventsViewModel(
     fun calculateDistanceToLocation(
         targetLocation: Location,
         context: Context,
-        onResult: (Double?) -> Unit
+        onSuccess: (Double?) -> Unit
     ) {
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
@@ -128,7 +131,7 @@ class EventsViewModel(
             ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
         ) {
             Log.d("EventsViewModel", "Location permissions not granted")
-            onResult(null)
+            onSuccess(null)
             return
         }
 
@@ -144,10 +147,7 @@ class EventsViewModel(
                     results
                 )
                 Log.d("EventsViewModel", "Distance to target location: ${results[0]} meters")
-                onResult(results[0].toDouble() / 1000)
-            } else {
-                Log.d("EventsViewModel", "Failed to get last known location")
-                onResult(null)
+                onSuccess(results[0].toDouble() / 1000)
             }
         }
     }
@@ -200,19 +200,8 @@ class EventsViewModel(
                                 .addOnSuccessListener {
                                     onSuccess()
                                 }
-                                .addOnFailureListener { e ->
-                                    println("Error deleting event: ${e.message}")
-                                }
                         }
-                        .addOnFailureListener { e ->
-                            println("Error updating club with removed event: ${e.message}")
-                        }
-                } else {
-                    println("event not found")
                 }
-            }
-            .addOnFailureListener { e ->
-                println("Error fetching event: ${e.message}")
             }
     }
 

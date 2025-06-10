@@ -9,7 +9,6 @@ import hr.ferit.josipnovak.projectrma.model.Location
 import kotlinx.coroutines.tasks.await
 
 class EditEventViewModel (
-    private val fbAuth: FirebaseAuth,
     private val db: FirebaseFirestore,
 ) : ViewModel(){
 

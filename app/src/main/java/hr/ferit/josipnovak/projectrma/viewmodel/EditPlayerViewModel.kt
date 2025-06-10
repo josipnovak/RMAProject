@@ -7,7 +7,6 @@ import hr.ferit.josipnovak.projectrma.model.User
 import kotlinx.coroutines.tasks.await
 
 class EditPlayerViewModel(
-    private val fbAuth: FirebaseAuth,
     private val db: FirebaseFirestore,
 ) : ViewModel() {
 
@@ -31,11 +30,5 @@ class EditPlayerViewModel(
     fun updatePlayer(player: User) {
         val playerRef = db.collection("users").document(player.id)
         playerRef.set(player)
-            .addOnSuccessListener {
-                println("Player updated successfully")
-            }
-            .addOnFailureListener { e ->
-                println("Error updating player: ${e.message}")
-            }
     }
 }

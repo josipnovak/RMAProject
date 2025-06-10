@@ -80,16 +80,10 @@ fun PlayersView(modifier: Modifier = Modifier, navController: NavController, pla
                         onSuccess = { groupedPlayers ->
                             players = groupedPlayers
                             Log.d("Players", "Fetched players: $players")
-                        },
-                        onError = { errorMessage ->
-                            println("Error: $errorMessage")
                         }
                     )
                 }
                 role = fetchedRole
-            },
-            onError = { error ->
-
             }
         )
     }

@@ -32,23 +32,11 @@ class AccountDetailsViewModel(
                                     userObj.id = user.id
                                     callback(userObj, club)
                                 }
-                                .addOnFailureListener {
-                                    callback(User(), Club())
-                                }
-                            callback(User(), Club())
-                        } else {
-                            callback(User(), Club())
                         }
                     }
-                    .addOnFailureListener {
-                        callback(User(), Club())
-                    }
-            } else {
-                callback(User(), Club())
             }
-        } else {
-            callback(User(), Club())
         }
+        callback(User(), Club())
     }
 
     fun logout() {

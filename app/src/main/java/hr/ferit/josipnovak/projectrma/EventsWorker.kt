@@ -15,6 +15,7 @@ class EventsWorker(context: Context, workerParams: WorkerParameters) :
     CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
+        Log.d("EventsWorker123", "doWork called")
         val fbAuth = FirebaseAuth.getInstance()
         val db = FirebaseFirestore.getInstance()
         val currentUser = fbAuth.currentUser ?: return Result.success()
@@ -37,16 +38,15 @@ class EventsWorker(context: Context, workerParams: WorkerParameters) :
                 id = document.getString("id") ?: "",
                 name = document.getString("name") ?: "",
                 type = document.getString("type") ?: "",
-                notified = document.getBoolean("notified") == true,
+                notifiedUsers = document.get("notifiedUsers") as? List<String> ?: emptyList(),
             )
         }
-
         val latestEvent = events.firstOrNull()
 
-        if (latestEvent != null && !latestEvent.notified) {
+        if (latestEvent != null && !latestEvent.notifiedUsers.contains(user.id)) {
             db.collection("events")
                 .document(latestEvent.id)
-                .update("notified", true)
+                .update("notifiedUsers", latestEvent.notifiedUsers + user.id)
                 .await()
             showEventNotification(applicationContext, latestEvent)
         }
@@ -55,8 +55,8 @@ class EventsWorker(context: Context, workerParams: WorkerParameters) :
 
     fun showEventNotification(context: Context, event: Event) {
         val channelId = "events_channel"
-        val title = "New Event: ${event.type}"
-        val message = "Type: ${event.name}"
+        val title = event.type
+        val message = event.name
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
 
         val notification = NotificationCompat.Builder(context, channelId)

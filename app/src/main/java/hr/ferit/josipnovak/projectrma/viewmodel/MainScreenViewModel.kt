@@ -17,7 +17,7 @@ class MainScreenViewModel(
     private val fbAuth: FirebaseAuth,
     private val db: FirebaseFirestore,
 ) : ViewModel() {
-    fun getUserAndClubData(callback: (User, Club) -> Unit) {
+    fun getUserAndClubData(onSuccess: (User, Club) -> Unit) {
         val currentUser = fbAuth.getCurrentUser()
         if (currentUser != null) {
             val email = currentUser.email
@@ -36,25 +36,13 @@ class MainScreenViewModel(
                                     club.id = clubDocument.id
                                     val userObj = user.toObject(User::class.java) ?: User()
                                     userObj.id = user.id
-                                    callback(userObj, club)
+                                    onSuccess(userObj, club)
                                 }
-                                .addOnFailureListener {
-                                    callback(User(), Club())
-                                }
-                            callback(User(), Club())
-                        } else {
-                            callback(User(), Club())
                         }
                     }
-                    .addOnFailureListener {
-                        callback(User(), Club())
-                    }
-            } else {
-                callback(User(), Club())
             }
-        } else {
-            callback(User(), Club())
         }
+        onSuccess(User(), Club())
     }
     fun getBestPlayers(
         onSuccess: (List<User>) -> Unit

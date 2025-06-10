@@ -16,8 +16,7 @@ class AddPlayerViewModel(
     val message: StateFlow<String> = _message
 
     fun getUserDetails(
-        onSuccess: (String, String, String) -> Unit,
-        onError: (String) -> Unit
+        onSuccess: (String, String, String) -> Unit
     ) {
         val currentUser = fbAuth.getCurrentUser()
         if (currentUser != null) {
@@ -33,22 +32,13 @@ class AddPlayerViewModel(
                             val clubId = user.getString("clubId") ?: "No Club ID"
                             val role = user.getString("role") ?: "No Role"
                             onSuccess(userId, clubId, role)
-                        } else {
-                            onError("User not found in database")
                         }
                     }
-                    .addOnFailureListener { exception ->
-                        onError(exception.message ?: "Error fetching user details")
-                    }
-            } else {
-                onError("Email not found for the current user")
             }
-        } else {
-            onError("No user is logged in")
         }
     }
 
-    fun addNewPlayer(player: User, clubId: String, onSucces: () -> Unit) {
+    fun addNewPlayer(player: User, clubId: String, onSuccess: () -> Unit) {
         if(player.position == "" || player.name == "") {
             _message.value = "Name and position cannot be empty"
             return
@@ -60,14 +50,8 @@ class AddPlayerViewModel(
                 db.collection("clubs").document(clubId)
                     .update("players", FieldValue.arrayUnion(player.id))
                     .addOnSuccessListener {
-                        onSucces()
+                        onSuccess()
                     }
-                    .addOnFailureListener { e ->
-                        println("Error updating club with new player: ${e.message}")
-                    }
-            }
-            .addOnFailureListener { e ->
-                println("Error adding new player: ${e.message}")
             }
     }
 }

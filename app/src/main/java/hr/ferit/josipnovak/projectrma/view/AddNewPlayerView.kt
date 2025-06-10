@@ -65,9 +65,6 @@ fun AddNewPlayerView(modifier: Modifier = Modifier, navController: NavController
                if (fetchedRole == "coach") {
                     clubId = fetchedClubIdOrRole
                }
-            },
-            onError = { error ->
-
             }
         )
     }

@@ -83,10 +83,10 @@ class MainActivity : ComponentActivity() {
             val mainScreenViewModel = MainScreenViewModel(fbAuth, db)
             val playersViewModel1 = PlayersViewModel(fbAuth, db)
             val addPlayerViewModel = AddPlayerViewModel(fbAuth, db)
-            val editPlayerViewModel = EditPlayerViewModel(fbAuth, db)
+            val editPlayerViewModel = EditPlayerViewModel(db)
             val eventsViewModel1 = EventsViewModel(fbAuth, db)
             val addEventViewModel = AddEventViewModel(fbAuth, db)
-            val editEventViewModel = EditEventViewModel(fbAuth, db)
+            val editEventViewModel = EditEventViewModel(db)
             val accountDetailsViewModel = AccountDetailsViewModel(fbAuth, db)
             val startDestination = if (fbAuth.getCurrentUser() != null) "main" else "start"
             ProjectRMATheme {

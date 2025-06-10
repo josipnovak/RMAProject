@@ -23,8 +23,7 @@ class PlayersViewModel(
     val message: StateFlow<String> = _message
 
     fun getUserDetails(
-        onSuccess: (String, String, String) -> Unit,
-        onError: (String) -> Unit
+        onSuccess: (String, String, String) -> Unit
     ) {
         val currentUser = fbAuth.getCurrentUser()
         if (currentUser != null) {
@@ -40,25 +39,15 @@ class PlayersViewModel(
                             val clubId = user.getString("clubId") ?: "No Club ID"
                             val role = user.getString("role") ?: "No Role"
                             onSuccess(userId, clubId, role)
-                        } else {
-                            onError("User not found in database")
                         }
                     }
-                    .addOnFailureListener { exception ->
-                        onError(exception.message ?: "Error fetching user details")
-                    }
-            } else {
-                onError("Email not found for the current user")
             }
-        } else {
-            onError("No user is logged in")
         }
     }
 
     fun getPlayers(
         clubId: String,
-        onSuccess: (Map<String, List<User>>) -> Unit,
-        onError: (String) -> Unit
+        onSuccess: (Map<String, List<User>>) -> Unit
     ) {
         db.collection("clubs").document(clubId)
             .get()
@@ -88,12 +77,6 @@ class PlayersViewModel(
 
                         onSuccess(groupedPlayers)
                     }
-                    .addOnFailureListener { exception ->
-                        onError(exception.message ?: "Error fetching player details")
-                    }
-            }
-            .addOnFailureListener { exception ->
-                onError(exception.message ?: "Error fetching players array")
             }
     }
 
@@ -135,22 +118,11 @@ class PlayersViewModel(
                                 .addOnSuccessListener {
                                     onSuccess()
                                 }
-                                .addOnFailureListener { e ->
-                                    println("Error deleting player: ${e.message}")
-                                }
                         }
-                        .addOnFailureListener { e ->
-                            println("Error updating club with removed player: ${e.message}")
-                        }
-                } else {
-                    println("Player not found")
                 }
             }
-            .addOnFailureListener { e ->
-                println("Error fetching player: ${e.message}")
-            }
     }
-    fun isCoach(callback: (Boolean) -> Unit) {
+    fun isCoach(onSuccess: (Boolean) -> Unit) {
         val currentUser = fbAuth.getCurrentUser()
         if (currentUser != null) {
             val email = currentUser.email
@@ -163,11 +135,11 @@ class PlayersViewModel(
                             val user = documents.first()
                             Log.d("EventsViewModel", "User document: ${user.getString("role")}")
                             val role = user.getString("role") ?: "No Role"
-                            callback(role == "coach")
+                            onSuccess(role == "coach")
                         }
                     }
             }
         }
-        callback(false)
+        onSuccess(false)
     }
 }
