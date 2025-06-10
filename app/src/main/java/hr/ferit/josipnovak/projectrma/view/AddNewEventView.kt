@@ -53,6 +53,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TimePicker
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -87,6 +88,7 @@ import com.google.android.gms.maps.internal.IGoogleMapDelegate
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.rpc.context.AttributeContext.Auth
 import hr.ferit.josipnovak.projectrma.R
@@ -354,6 +356,7 @@ fun AddNewEventView(modifier: Modifier = Modifier, navController: NavController,
                             name = eventName,
                             date = eventDate,
                             time = eventTime,
+                            createdAt = Timestamp.now(),
                             location = location
                         )
                         addEventViewModel.addNewEvent(event) {

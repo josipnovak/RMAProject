@@ -81,6 +81,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.NavController
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
@@ -365,6 +366,7 @@ fun EditEventView(modifier: Modifier = Modifier, navController: NavController, e
                             name = eventName,
                             date = eventDate,
                             time = eventTime,
+                            createdAt = Timestamp.now(),
                             location = location
                         )
                         Log.d("AddNewEventView", "Editing event: $event")

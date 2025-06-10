@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.firebase.firestore)
+    implementation(libs.androidx.work.runtime.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -69,5 +70,6 @@ dependencies {
     implementation ("com.google.android.gms:play-services-maps:18.1.0")
     implementation ("com.google.maps.android:maps-compose:2.11.0")
     implementation ("com.google.android.gms:play-services-location:21.3.0")
-    implementation("com.google.accompanist:accompanist-permissions:0.30.1")
+    implementation ("com.google.accompanist:accompanist-permissions:0.30.1")
+    implementation ("androidx.core:core:1.16.0")
 }

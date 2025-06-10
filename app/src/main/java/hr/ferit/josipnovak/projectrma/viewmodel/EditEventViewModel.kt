@@ -1,6 +1,7 @@
 package hr.ferit.josipnovak.projectrma.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import hr.ferit.josipnovak.projectrma.FirebaseAuth
 import hr.ferit.josipnovak.projectrma.model.Event
@@ -30,6 +31,7 @@ class EditEventViewModel (
                     name = document.getString("name") ?: "",
                     date = document.getString("date") ?: "",
                     time = document.getString("time") ?: "",
+                    createdAt = Timestamp.now(),
                     location = location
                 )
             } else {

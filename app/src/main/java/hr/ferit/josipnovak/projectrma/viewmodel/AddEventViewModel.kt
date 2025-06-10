@@ -45,12 +45,6 @@ class AddEventViewModel(
                                         .addOnSuccessListener {
                                             onSuccess(true)
                                         }
-                                        .addOnFailureListener { e ->
-                                            _message.value = "Error updating club with new event: ${e.message}"
-                                        }
-                                }
-                                .addOnFailureListener { e ->
-                                    _message.value = "Error adding new event: ${e.message}"
                                 }
                         }
                     }

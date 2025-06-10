@@ -3,9 +3,13 @@ package hr.ferit.josipnovak.projectrma
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -20,6 +24,9 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.google.firebase.firestore.FirebaseFirestore
 import hr.ferit.josipnovak.projectrma.ui.theme.ProjectRMATheme
 import hr.ferit.josipnovak.projectrma.view.LoginScreenView
@@ -45,8 +52,9 @@ import hr.ferit.josipnovak.projectrma.viewmodel.EditPlayerViewModel
 import hr.ferit.josipnovak.projectrma.viewmodel.EventsViewModel
 import hr.ferit.josipnovak.projectrma.viewmodel.MainScreenViewModel
 import hr.ferit.josipnovak.projectrma.viewmodel.PlayersViewModel
+import java.util.concurrent.TimeUnit
 
-
+@RequiresApi(Build.VERSION_CODES.Q)
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("ViewModelConstructorInComposable")
@@ -54,6 +62,19 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         requestLocationPermissions(this)
+        requestNotificationPermission()
+        createNotificationChannel(this)
+
+        val workRequest = PeriodicWorkRequestBuilder<EventsWorker>(15, TimeUnit.MINUTES).build()
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "EventsWorker",
+            androidx.work.ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
+        )
+
+        val onStartRequest = OneTimeWorkRequestBuilder<EventsWorker>().build()
+        WorkManager.getInstance(this).enqueue(onStartRequest)
+
         setContent {
             val navController = rememberNavController()
             val fbAuth = FirebaseAuth
@@ -124,6 +145,40 @@ class MainActivity : ComponentActivity() {
 
         if (permissionsToRequest.isNotEmpty()) {
             ActivityCompat.requestPermissions(activity, permissionsToRequest.toTypedArray(), 1001)
+        }
+    }
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun requestNotificationPermission() {
+        val permissionsToRequest = mutableListOf<String>()
+        if (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACTIVITY_RECOGNITION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissionsToRequest.add(Manifest.permission.ACTIVITY_RECOGNITION)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this, Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+        if (permissionsToRequest.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this, permissionsToRequest.toTypedArray(), 1)
+        }
+    }
+
+    fun createNotificationChannel(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = "events_channel"
+            val channelName = "Events Notifications"
+            val channel = NotificationChannel(
+                channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT
+            )
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+            Log.d("MainActivity", "Notification channel created: $channelId")
         }
     }
 }
