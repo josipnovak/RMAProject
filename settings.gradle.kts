@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ProjectRMA"
+rootProject.name = "Boban"
 include(":app")
  

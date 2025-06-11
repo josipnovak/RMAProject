@@ -62,7 +62,7 @@ class EventsWorker(context: Context, workerParams: WorkerParameters) :
         val notification = NotificationCompat.Builder(context, channelId)
             .setContentTitle(title)
             .setContentText(message)
-            .setSmallIcon(R.drawable.ic_launcher_background)
+            .setSmallIcon(R.mipmap.new_icon)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .build()
 
